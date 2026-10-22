@@ -1,4 +1,5 @@
-咕噜罐头管家 FINAL 3.1
-解压后，把 index.html 上传到 GitHub 仓库根目录并覆盖旧文件。
-建议上传前先从旧版导出JSON备份。本版支持导入新版备份及原APP activeCatId + pantry 格式。
-ZIP内只有 index.html 和 README.txt。
+咕噜罐头管家 FINAL 3.2
+
+修正：不再按低磷+小规格排序；增加85g连续开启惩罚、200/400g规格组合、7天去重、G4月占比保护、7天/30天磷偏差评分和库存权重。
+增加每个SKU的识别卡；识别卡不是包装实拍，未核对包装图的SKU明确标示待补。
+解压后上传index.html到GitHub仓库根目录覆盖旧文件。
