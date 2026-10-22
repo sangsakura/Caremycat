@@ -1,15 +1,10 @@
-咕噜罐头管家 FINAL 4.2 安全导入版
+咕噜罐头管家 FINAL 5.0｜无需导入版
 
-只修复导入安全性，不改变FINAL 4.1页面结构与计划算法。
+已直接内置你在“文本(1).txt”中确认成功的原始库存：
+- 196件未开封
+- 84个SKU
+- 83个库存批次
 
-安全机制：
-- iPhone使用FileReader读取TXT/JSON/无扩展名文件。
-- 选择文件后仅显示导入预览，不立即覆盖。
-- 预览显示库存件数、SKU、批次、摄入记录。
-- 仅点击“确认导入并重算”后才替换。
-- 任意错误自动恢复导入前内存状态和localStorage。
-- 恢复内置数据必须输入完整确认短语。
+不再要求导入TXT/JSON。首次打开即加载完整库存。修复 pack is not defined 渲染错误。
 
-支持FINAL 3/4、catCanTrackerV1、gulu-openplan-max2、activeCatId+pantry及顶层pantry数组。
-
-GitHub：用ZIP内index.html覆盖仓库根目录旧index.html。
+上传：解压后将 index.html 覆盖GitHub仓库根目录旧文件。由于使用新的本地存储键，第一次打开会采用内置196件库存；之后操作自动保存在当前浏览器。
