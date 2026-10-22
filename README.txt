@@ -1,6 +1,15 @@
-咕噜罐头管家 FINAL 4.1
+咕噜罐头管家 FINAL 4.2 安全导入版
 
-重点修复导入：先解析、转换、校验，全部成功后才覆盖当前数据；导入失败会自动回滚，不会出现空库存/空设置。
-兼容 FINAL 3/4、catCanTrackerV1、gulu-openplan-max2、原APP activeCatId+pantry，以及顶层pantry数组。
-导入成功后弹窗会显示导入库存件数和SKU数。
-仍保留FINAL 4.0的硬规则：任何一天最多2个未吃完；现有余量足够不新开；每周2-3种只作为轮换目标；85g不优先；7/30天磷预算与GX覆盖率。
+只修复导入安全性，不改变FINAL 4.1页面结构与计划算法。
+
+安全机制：
+- iPhone使用FileReader读取TXT/JSON/无扩展名文件。
+- 选择文件后仅显示导入预览，不立即覆盖。
+- 预览显示库存件数、SKU、批次、摄入记录。
+- 仅点击“确认导入并重算”后才替换。
+- 任意错误自动恢复导入前内存状态和localStorage。
+- 恢复内置数据必须输入完整确认短语。
+
+支持FINAL 3/4、catCanTrackerV1、gulu-openplan-max2、activeCatId+pantry及顶层pantry数组。
+
+GitHub：用ZIP内index.html覆盖仓库根目录旧index.html。
