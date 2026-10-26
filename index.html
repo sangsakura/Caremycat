@@ -1,34 +1,1976 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>咕噜罐头管家 FINAL 5.2 iPhone</title><style>*{box-sizing:border-box}body{margin:0;background:#f6f6fb;color:#29273a;font-family:-apple-system,"PingFang SC",sans-serif;padding-bottom:calc(76px + env(safe-area-inset-bottom))}header{background:linear-gradient(135deg,#6c5ce7,#967cf0);color:#fff;padding:20px 16px}header h1{margin:0}.wrap{max-width:760px;margin:auto;padding:12px}.card{background:#fff;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 2px 12px #29273a0d}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.kpi{background:#f0eefc;border-radius:13px;padding:11px}.kpi b{font-size:23px;display:block}.muted{color:#77758a;font-size:12px}.item{padding:11px;border-bottom:1px solid #eee}.row{display:flex;align-items:center;gap:8px}.between{justify-content:space-between}button,.btn{border:0;border-radius:11px;padding:10px 12px;background:#6c5ce7;color:#fff;font-weight:700}button.sec,.btn.sec{background:#efedfb;color:#5c49c8}button.bad{background:#ffe3e8;color:#a52d40}input,select{width:100%;padding:10px;border:1px solid #ddd8eb;border-radius:10px;font:inherit}label{display:block;margin:8px 0 4px;font-size:12px;color:#77758a}.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;background:#fff;border-top:1px solid #eee}.tabs button{flex:1;background:#fff;color:#777;border-radius:0;font-size:11px;padding:9px 2px}.tabs button.on{color:#6c5ce7}.page{display:none}.page.on{display:block}.day,.open{background:#faf9ff;border:1px solid #e8e5f3;border-radius:13px;padding:11px;margin:8px 0}.new{border-left:5px solid #db891e}.warn{background:#fff4de;padding:9px;border-radius:9px;font-size:12px}.modal{display:none;position:fixed;inset:0;background:#0007;z-index:20;align-items:flex-end}.modal.on{display:flex}.sheet{background:#fff;width:100%;max-height:90vh;overflow:auto;border-radius:20px 20px 0 0;padding:17px}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions>*{flex:1}.pack{width:64px;height:78px;border-radius:9px 9px 14px 14px;background:linear-gradient(145deg,#fff,#e9e4ff);border:1px solid #d9d0f4;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4px;box-shadow:inset 0 7px 0 #c9bdf2;font-size:9px;color:#4a397e;flex:none}.pack b{font-size:10px}.withpack{display:grid;grid-template-columns:64px 1fr;gap:10px;align-items:center}.pill{font-size:11px;background:#eeeafb;color:#5948bd;padding:4px 8px;border-radius:30px}@media(min-width:700px){.tabs{max-width:760px;left:50%;transform:translateX(-50%)}.sheet{max-width:700px;margin:auto}}.fatal{display:none;position:fixed;z-index:99999;inset:12px;background:#fff4f4;border:2px solid #d32f2f;border-radius:14px;padding:16px;overflow:auto;color:#5b1111}.fatal.show{display:block}.fatal pre{white-space:pre-wrap;word-break:break-word;background:#fff;padding:10px;border-radius:8px}</style></head><body><div id="fatalPanel" class="fatal"><h2>页面运行错误</h2><p>请截取此处内容用于排查。</p><pre id="fatalText"></pre><button onclick="location.reload()">重新加载</button></div><header><h1>🐱 咕噜罐头管家</h1><div>FINAL 5.2 iPhone · 完整库存、开罐轮换、实际摄入、7天/30天磷负荷</div></header><main class="wrap"><section id="home" class="page on"><div class="grid"><div class="kpi"><b id="stockN">0</b><span>未开封库存</span></div><div class="kpi"><b id="openN">0/2</b><span>当前已开</span></div></div><div class="card"><div class="row between"><h2>今日建议</h2><button class="sec" onclick="plan()">重算</button></div><div id="today"></div><button style="width:100%" onclick="showEat()">记录实际摄入</button></div><div class="card"><div class="row between"><h2>已开罐</h2><button onclick="showOpen()">＋开罐</button></div><div id="opens"></div></div><div class="warn">每周打开2–3种，可轮换或同日混合；普通罐开封后14天内吃完，可冷冻。实际摄入后自动扣余量并重算。</div></section><section id="plans" class="page"><div class="card"><h2>7天 / 30天磷负荷</h2><div class="grid"><div class="kpi"><b id="p7">--</b><span>滚动7天</span><div id="c7" class="muted"></div></div><div class="kpi"><b id="p30">--</b><span>滚动30天</span><div id="c30" class="muted"></div></div></div></div><div class="card"><h2>未来30天</h2><div id="days"></div></div></section><section id="inv" class="page"><div class="card"><div class="row between"><h2>库存</h2><button onclick="showAdd()">＋入库</button></div><input id="q" placeholder="搜索品牌/口味/SKU/等级/规格" oninput="render()"><label>快速筛选</label><div class="row"><select id="gradeFilter" onchange="render()"><option value="">全部等级</option><option>G1</option><option>G2</option><option>G3</option><option>G4</option><option>GX</option></select><select id="sizeFilter" onchange="render()"><option value="">全部规格</option><option value="85">85g</option><option value="125">125g</option><option value="200">200g</option><option value="300">300g</option><option value="400">400g</option></select></div><div id="inventory"></div></div></section><section id="hist" class="page"><div class="card"><h2>实际摄入与流水</h2><div id="history"></div></div></section><section id="set" class="page"><div class="card"><h2>设置</h2><label>每日湿粮目标(g)</label><input id="target" type="number"><label>开罐期限(天)</label><input id="maxDays" type="number"><label>每7天新开最少/最多品种</label><div class="grid"><input id="wmin" type="number"><input id="wmax" type="number"></div><label>同时已开上限</label><input id="maxOpen" type="number"><button style="width:100%;margin-top:12px" onclick="saveSet()">保存并重算</button></div><div class="card"><h2>数据管理</h2><div class="actions"><button onclick="backup()">导出备份</button><span class="btn sec" style="text-align:center">已内置196件 / 84 SKU</span><button class="bad" onclick="reset()">恢复内置数据</button></div></div></section></main><nav class="tabs"><button class="on" data-p="home">🥫<br>今日</button><button data-p="plans">📅<br>30天</button><button data-p="inv">📦<br>库存</button><button data-p="hist">✍️<br>记录</button><button data-p="set">⚙️<br>设置</button></nav><div id="openM" class="modal"><div class="sheet"><h2>打开新罐</h2><label>搜索要开的罐头</label><input id="openSearch" placeholder="品牌/口味/SKU" oninput="filterOpenSelect()"><label>品项</label><select id="openSku"></select><label>开罐重量(g)</label><input id="openG" type="number"><label><input id="freeze" type="checkbox" style="width:auto"> 已分装冷冻</label><div class="actions"><button onclick="openSave()">确认</button><button class="sec" onclick="cm('openM')">取消</button></div></div></div><div id="eatM" class="modal"><div class="sheet"><h2>记录实际摄入</h2><label>日期</label><input id="eatDate" type="date"><label>已开罐</label><select id="eatOpen"></select><label>实际克数</label><input id="eatG" type="number"><label>备注</label><input id="note"><div class="actions"><button onclick="eatSave()">保存并重算</button><button class="sec" onclick="cm('eatM')">取消</button></div></div></div><div id="addM" class="modal"><div class="sheet"><h2>新增库存</h2><label>品牌</label><input id="brand"><label>口味/名称</label><input id="food"><label>规格(g)</label><input id="size" type="number"><label>数量</label><input id="qty" type="number" value="1"><label>kcal/100g</label><input id="kcal" type="number"><label>磷 mg/1000kcal</label><input id="phos" type="number"><label>等级</label><select id="grade"><option>G1</option><option>G2</option><option>G3</option><option>G4</option><option selected>GX</option></select><div class="actions"><button onclick="addSave()">保存</button><button class="sec" onclick="cm('addM')">取消</button></div></div></div><script>
-window.onerror=function(m,u,l,c,e){var p=document.getElementById('fatalPanel'),t=document.getElementById('fatalText');if(p&&t){t.textContent=String(m)+'\n行: '+l+' 列: '+c+'\n'+(e&&e.stack?e.stack:'');p.className='fatal show';}return false;};
-if(!String.prototype.includes){String.prototype.includes=function(x,n){return this.indexOf(x,n||0)!==-1;};}
-if(!Array.prototype.find){Array.prototype.find=function(fn){for(var i=0;i<this.length;i++)if(fn(this[i],i,this))return this[i];};}
-if(!Array.prototype.flatMap){Array.prototype.flatMap=function(fn){return Array.prototype.concat.apply([],this.map(fn));};}
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7568e8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>咕噜罐头管家</title>
 
-const K='gulu-complete-final-52-ios',T=()=>new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Shanghai'}),A=(s,n)=>{let d=new Date(s+'T12:00:00+08:00');d.setDate(d.getDate()+n);return d.toLocaleDateString('sv-SE',{timeZone:'Asia/Shanghai'})},U=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);const seed=[['cf403','凯姿','403鸡肉',85,23,95,1597,'G1'],['cf409','凯姿','409火鸡鸡兔',85,11,95,1531,'G1'],['cf413','凯姿','413鸡肉吞拿鱼',85,9,95,1520,'G1'],['gp5','交响乐','No.5纯鸡',200,6,110,2487,'G4'],['gp8','交响乐','No.8雉鸡鸭鸡',200,5,110,2653,'G4'],['gp9','交响乐','No.9雉鸡兔',200,4,110,2653,'G4'],['gp3','交响乐','No.3野味鸡',200,1,110,2485,'G4'],['mjam','喵吖喵','老年多汁鸡',400,1,103,2677,'G4'],['wild','王尔德','炖兔和鸡',180,5,null,null,'GX'],['pur','德金','鸡肉野猪',200,1,104,1860,'G2'],['ven','蔚安迪','鸡兔',400,1,105,2262,'G3'],['betty','老奶奶','雪境纯鸡',200,8,null,null,'GX'],['leon','小李子','鸡肉菠菜',200,5,null,null,'GX']];const BUILTIN={"set":{"target":80,"maxDays":14,"wmin":2,"wmax":3,"maxOpen":2},"cat":{"eu-baltica-mono-bazant-dla-kota-18":{"id":"eu-baltica-mono-bazant-dla-kota-18","brand":"波罗的海","name":"eu-baltica-mono-bazant-dla-kota-18","size":185.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-purizon-purizon-original-adult-huehnerfilet-mit-wildschwein-tin":{"id":"eu-purizon-purizon-original-adult-huehnerfilet-mit-wildschwein-tin","brand":"德金","name":"鸡肉/野猪","size":200.0,"kcal":104,"p":1860,"grade":"G2","image":""},"eu-mjamjam-purer-fleischgenuss-leckeres-wildschwein-pur-pouch":{"id":"eu-mjamjam-purer-fleischgenuss-leckeres-wildschwein-pur-pouch","brand":"喵吖喵","name":"野猪","size":125.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-quetschie-schmackhafter-truthahn-an-leckeren-moehrchen-pouch":{"id":"eu-mjamjam-quetschie-schmackhafter-truthahn-an-leckeren-moehrchen-pouch","brand":"喵吖喵","name":"火鸡","size":125.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-quetschie-chicks-friends-koestliches-huhn-an-feinen-moehrchen":{"id":"eu-mjamjam-quetschie-chicks-friends-koestliches-huhn-an-feinen-moehrchen","brand":"喵吖喵","name":"鸡肉","size":125.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-quetschie-chicks-friends-schmackhaftes-huehnchen-an-geduenste":{"id":"eu-mjamjam-quetschie-chicks-friends-schmackhaftes-huehnchen-an-geduenste","brand":"喵吖喵","name":"鸡肉","size":125.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-quetschie-chicks-friends-saftiges-huehnchen-an-gedaempftem-sp":{"id":"eu-mjamjam-quetschie-chicks-friends-saftiges-huehnchen-an-gedaempftem-sp","brand":"喵吖喵","name":"鸡肉","size":125.0,"kcal":null,"p":null,"grade":"GX","image":""},"halo-classic-cn-made-senior-chicken-dry":{"id":"halo-classic-cn-made-senior-chicken-dry","brand":"其他品牌","name":"鸡肉","size":2500.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-duo-von-saftigem-huehnchen-kaninchen-an-gedaempftem-kuerbis-t":{"id":"eu-mjamjam-duo-von-saftigem-huehnchen-kaninchen-an-gedaempftem-kuerbis-t","brand":"喵吖喵","name":"鸡肉/兔肉","size":400.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-purer-fleischgenuss-delikates-kaenguru-pur-tin":{"id":"eu-mjamjam-purer-fleischgenuss-delikates-kaenguru-pur-tin","brand":"喵吖喵","name":"袋鼠","size":400.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-goddess-chicken-fillet":{"id":"eu-goddess-chicken-fillet","brand":"其他品牌","name":"鸡肉","size":85.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-purizon-purizon-original-adult-huehnerfilet-mit-lachs-tin":{"id":"eu-purizon-purizon-original-adult-huehnerfilet-mit-lachs-tin","brand":"德金","name":"鸡肉/三文鱼","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-duett-huehnchen-filet-kuesst-rind-tin":{"id":"eu-mjamjam-duett-huehnchen-filet-kuesst-rind-tin","brand":"喵吖喵","name":"鸡肉/牛肉","size":390.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-senior-saftiges-huehnchen-tin":{"id":"eu-mjamjam-senior-saftiges-huehnchen-tin","brand":"喵吖喵","name":"鸡肉","size":400.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-betty-s-landhauskueche-senior-huehnchen-mit-kuerbis-und-lachsoel-tin":{"id":"eu-betty-s-landhauskueche-senior-huehnchen-mit-kuerbis-und-lachsoel-tin","brand":"老奶奶","name":"鸡肉/三文鱼","size":400.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-venandi-animal-huhn-kaninchen-tin":{"id":"eu-venandi-animal-huhn-kaninchen-tin","brand":"蔚安迪","name":"鸡肉/兔肉","size":400.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-venandi-animal-pute-als-monoprotein-tin":{"id":"eu-venandi-animal-pute-als-monoprotein-tin","brand":"蔚安迪","name":"火鸡","size":400.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-venandi-animal-kitten-huhn-mit-lachsoel-tin":{"id":"eu-venandi-animal-kitten-huhn-mit-lachsoel-tin","brand":"蔚安迪","name":"鸡肉/三文鱼","size":400.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-insekt-mit-vorzueglichem-kalb-tin":{"id":"eu-mjamjam-insekt-mit-vorzueglichem-kalb-tin","brand":"喵吖喵","name":"eu-mjamjam-insekt-mit-vorzueglichem-kalb-tin","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-goddess-turkey-guineafowl":{"id":"eu-goddess-turkey-guineafowl","brand":"其他品牌","name":"火鸡","size":85.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-goddess-chicken-poultry":{"id":"eu-goddess-chicken-poultry","brand":"其他品牌","name":"鸡肉","size":85.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-goddess-duck-chicken":{"id":"eu-goddess-duck-chicken","brand":"其他品牌","name":"鸡肉/鸭肉","size":85.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-goddess-poultry-pheasant":{"id":"eu-goddess-poultry-pheasant","brand":"其他品牌","name":"雉鸡","size":85.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-granatapet-pferd-huhn-pouch":{"id":"eu-granatapet-pferd-huhn-pouch","brand":"交响乐","name":"鸡肉/马肉","size":85.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-granatapet-huhn-kaninchen-pouch":{"id":"eu-granatapet-huhn-kaninchen-pouch","brand":"交响乐","name":"鸡肉/兔肉","size":85.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-granatapet-ente-huhn-pouch":{"id":"eu-granatapet-ente-huhn-pouch","brand":"交响乐","name":"鸡肉/鸭肉","size":85.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-vorzuegliches-kalb-und-leckerer-truthahn-an-feinen-moehrchen-tin":{"id":"eu-mjamjam-vorzuegliches-kalb-und-leckerer-truthahn-an-feinen-moehrchen-tin","brand":"喵吖喵","name":"火鸡","size":400.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-natural-trail-monoprotein-boar":{"id":"eu-natural-trail-monoprotein-boar","brand":"其他品牌","name":"野猪","size":185.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-betty-s-landhauskueche-mit-kaenguru-kartoffel-tin":{"id":"eu-betty-s-landhauskueche-mit-kaenguru-kartoffel-tin","brand":"老奶奶","name":"袋鼠","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-betty-s-landhauskueche-huhn-forelle-200g-tin":{"id":"eu-betty-s-landhauskueche-huhn-forelle-200g-tin","brand":"老奶奶","name":"鸡肉","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-betty-s-landhauskueche-rind-pur-mit-leinoel-tin":{"id":"eu-betty-s-landhauskueche-rind-pur-mit-leinoel-tin","brand":"老奶奶","name":"牛肉","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-mahlzeit-mit-leckeren-herzen-tin":{"id":"eu-mjamjam-mahlzeit-mit-leckeren-herzen-tin","brand":"喵吖喵","name":"eu-mjamjam-mahlzeit-mit-leckeren-herzen-tin","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-delizioeses-rentier-mit-huehnchen-an-leckeren-moehrchen-pouch":{"id":"eu-mjamjam-delizioeses-rentier-mit-huehnchen-an-leckeren-moehrchen-pouch","brand":"喵吖喵","name":"鸡肉","size":400.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-duett-huehnchen-filet-kuesst-pferd-tin":{"id":"eu-mjamjam-duett-huehnchen-filet-kuesst-pferd-tin","brand":"喵吖喵","name":"鸡肉/马肉","size":390.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-betty-s-landhauskueche-mit-ente-tin":{"id":"eu-betty-s-landhauskueche-mit-ente-tin","brand":"老奶奶","name":"鸭肉","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-betty-s-landhauskueche-mit-truthahn-borretschoel-tin":{"id":"eu-betty-s-landhauskueche-mit-truthahn-borretschoel-tin","brand":"老奶奶","name":"火鸡","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-duett-huehnchen-filet-kuesst-pute-tin":{"id":"eu-mjamjam-duett-huehnchen-filet-kuesst-pute-tin","brand":"喵吖喵","name":"鸡肉/火鸡","size":390.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-betty-s-landhauskueche-pferd-pur-borretschoel-200g-tin":{"id":"eu-betty-s-landhauskueche-pferd-pur-borretschoel-200g-tin","brand":"老奶奶","name":"马肉","size":400.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-betty-s-landhauskueche-huhn-und-fasan-mit-borretschoel-tin":{"id":"eu-betty-s-landhauskueche-huhn-und-fasan-mit-borretschoel-tin","brand":"老奶奶","name":"鸡肉/雉鸡","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-betty-s-landhauskueche-fuer-kitten-huehnchen-mit-pute-tin":{"id":"eu-betty-s-landhauskueche-fuer-kitten-huehnchen-mit-pute-tin","brand":"老奶奶","name":"鸡肉/火鸡","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-kittycat-ente":{"id":"eu-kittycat-ente","brand":"其他品牌","name":"鸭肉","size":85.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-leckeres-rind-an-gedaempftem-kuerbis-tin":{"id":"eu-mjamjam-leckeres-rind-an-gedaempftem-kuerbis-tin","brand":"喵吖喵","name":"牛肉","size":85.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-catz-finefood-n-409-pute-huhn-kaninchen-in-jelly-pouch":{"id":"eu-catz-finefood-n-409-pute-huhn-kaninchen-in-jelly-pouch","brand":"凯姿","name":"鸡肉/火鸡/兔肉","size":85.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-wildes-land-fasan-und-huhn-tin":{"id":"eu-wildes-land-fasan-und-huhn-tin","brand":"王尔德","name":"鸡肉/雉鸡","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-catz-finefood-n-15-huhn-fasan-800-g-tin-tin":{"id":"eu-catz-finefood-n-15-huhn-fasan-800-g-tin-tin","brand":"凯姿","name":"鸡肉/雉鸡","size":85.0,"kcal":null,"p":null,"grade":"GX","image":""},"usr-399bedb5c9c84dcc":{"id":"usr-399bedb5c9c84dcc","brand":"其他品牌","name":"usr-399bedb5c9c84dcc","size":400.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-granatapet-no-9-fasan-kaninchen-tin":{"id":"eu-granatapet-no-9-fasan-kaninchen-tin","brand":"交响乐","name":"兔肉/雉鸡","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-herzhaftes-wild-kaninchen-mit-fruchtigen-heidelbeeren-pouch":{"id":"eu-mjamjam-herzhaftes-wild-kaninchen-mit-fruchtigen-heidelbeeren-pouch","brand":"喵吖喵","name":"兔肉","size":300.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-tundra-pute-pur":{"id":"eu-tundra-pute-pur","brand":"其他品牌","name":"火鸡","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mac-s-cat-kitten-kalb-huehnerherzen-tin":{"id":"eu-mac-s-cat-kitten-kalb-huehnerherzen-tin","brand":"其他品牌","name":"鸡肉","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-granatapet-no-3-wild-huhn-tin":{"id":"eu-granatapet-no-3-wild-huhn-tin","brand":"交响乐","name":"鸡肉","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-fellicita-katzennassfutter-huhn-pute-und-ente-fuer-adulte-katzen-tin":{"id":"eu-fellicita-katzennassfutter-huhn-pute-und-ente-fuer-adulte-katzen-tin","brand":"其他品牌","name":"鸡肉/火鸡/鸭肉","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-wildes-land-kaninchen-und-huhn-mit-disteloel-tin":{"id":"eu-wildes-land-kaninchen-und-huhn-mit-disteloel-tin","brand":"王尔德","name":"鸡肉/兔肉","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-leonardo-huhn-mit-spinat-tin":{"id":"eu-leonardo-huhn-mit-spinat-tin","brand":"小李子","name":"鸡肉","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-duo-von-zarter-ente-saftigem-huehnchen-an-moehrchen-tin":{"id":"eu-mjamjam-duo-von-zarter-ente-saftigem-huehnchen-an-moehrchen-tin","brand":"喵吖喵","name":"鸡肉/鸭肉","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-gute-pute-an-gedaempftem-kuerbis-tin":{"id":"eu-mjamjam-gute-pute-an-gedaempftem-kuerbis-tin","brand":"喵吖喵","name":"火鸡","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-schmackhafter-truthahn-an-leckeren-moehrchen-tin":{"id":"eu-mjamjam-schmackhafter-truthahn-an-leckeren-moehrchen-tin","brand":"喵吖喵","name":"火鸡","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-kitten-saftiges-huehnchen-mit-lachsoel-tin":{"id":"eu-mjamjam-kitten-saftiges-huehnchen-mit-lachsoel-tin","brand":"喵吖喵","name":"鸡肉/三文鱼","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-catz-finefood-n-3-gefluegel-800-g-tin-tin":{"id":"eu-catz-finefood-n-3-gefluegel-800-g-tin-tin","brand":"凯姿","name":"eu-catz-finefood-n-3-gefluegel-800-g-tin-tin","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-kulinarischer-hirsch-und-truthahn-an-frischen-cranberries-pou":{"id":"eu-mjamjam-kulinarischer-hirsch-und-truthahn-an-frischen-cranberries-pou","brand":"喵吖喵","name":"火鸡","size":300.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-mjamjam-quetschie-chicks-friends-leckeres-huehnchen-an-fruchtigen-bir":{"id":"eu-mjamjam-quetschie-chicks-friends-leckeres-huehnchen-an-fruchtigen-bir","brand":"喵吖喵","name":"鸡肉","size":300.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-betty-s-landhauskueche-gefluegel-pur-tin":{"id":"eu-betty-s-landhauskueche-gefluegel-pur-tin","brand":"老奶奶","name":"eu-betty-s-landhauskueche-gefluegel-pur-tin","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-catz-finefood-n-25-huhn-thunfisch-800-g-tin-tin":{"id":"eu-catz-finefood-n-25-huhn-thunfisch-800-g-tin-tin","brand":"凯姿","name":"鸡肉/吞拿鱼","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-betty-s-landhauskueche-huhn-pur-borretschoel-tin":{"id":"eu-betty-s-landhauskueche-huhn-pur-borretschoel-tin","brand":"老奶奶","name":"鸡肉","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-catz-finefood-n-17-gefluegel-garnelen-800-g-tin-tin":{"id":"eu-catz-finefood-n-17-gefluegel-garnelen-800-g-tin-tin","brand":"凯姿","name":"对虾","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-granatapet-no-8-fasan-ente-mit-huhn-tin":{"id":"eu-granatapet-no-8-fasan-ente-mit-huhn-tin","brand":"交响乐","name":"鸡肉/鸭肉/雉鸡","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-granatapet-huhn-pur-pouch-85g":{"id":"eu-granatapet-huhn-pur-pouch-85g","brand":"交响乐","name":"鸡肉","size":85.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-granatapet-no-5-huhn-pur-tin":{"id":"eu-granatapet-no-5-huhn-pur-tin","brand":"交响乐","name":"鸡肉","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-catz-finefood-n-413-huhn-thunfisch-in-jelly-pouch":{"id":"eu-catz-finefood-n-413-huhn-thunfisch-in-jelly-pouch","brand":"凯姿","name":"鸡肉/吞拿鱼","size":85.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-catz-finefood-n-5-lachs-gefluegel-tin":{"id":"eu-catz-finefood-n-5-lachs-gefluegel-tin","brand":"凯姿","name":"三文鱼","size":200.0,"kcal":null,"p":null,"grade":"GX","image":""},"eu-catz-finefood-n-403-huhn-in-jelly-pouch":{"id":"eu-catz-finefood-n-403-huhn-in-jelly-pouch","brand":"凯姿","name":"鸡肉","size":85.0,"kcal":null,"p":null,"grade":"GX","image":""},"cf403":{"id":"cf403","brand":"凯姿","name":"403鸡肉","size":85,"kcal":95,"p":1597,"grade":"G1","image":""},"cf409":{"id":"cf409","brand":"凯姿","name":"409火鸡鸡兔","size":85,"kcal":95,"p":1531,"grade":"G1","image":""},"cf413":{"id":"cf413","brand":"凯姿","name":"413鸡肉吞拿鱼","size":85,"kcal":95,"p":1520,"grade":"G1","image":""},"gp5":{"id":"gp5","brand":"交响乐","name":"No.5纯鸡","size":200,"kcal":110,"p":2487,"grade":"G4","image":""},"gp8":{"id":"gp8","brand":"交响乐","name":"No.8雉鸡鸭鸡","size":200,"kcal":110,"p":2653,"grade":"G4","image":""},"gp9":{"id":"gp9","brand":"交响乐","name":"No.9雉鸡兔","size":200,"kcal":110,"p":2653,"grade":"G4","image":""},"gp3":{"id":"gp3","brand":"交响乐","name":"No.3野味鸡","size":200,"kcal":110,"p":2485,"grade":"G4","image":""},"mjam":{"id":"mjam","brand":"喵吖喵","name":"老年多汁鸡","size":400,"kcal":103,"p":2677,"grade":"G4","image":""},"wild":{"id":"wild","brand":"王尔德","name":"炖兔和鸡","size":180,"kcal":null,"p":null,"grade":"GX","image":""},"pur":{"id":"pur","brand":"德金","name":"鸡肉野猪","size":200,"kcal":104,"p":1860,"grade":"G2","image":""},"ven":{"id":"ven","brand":"蔚安迪","name":"鸡兔","size":400,"kcal":105,"p":2262,"grade":"G3","image":""},"betty":{"id":"betty","brand":"老奶奶","name":"雪境纯鸡","size":200,"kcal":null,"p":null,"grade":"GX","image":""},"leon":{"id":"leon","brand":"小李子","name":"鸡肉菠菜","size":200,"kcal":null,"p":null,"grade":"GX","image":""}},"batches":[{"id":"mvelmqyl-5","sku":"eu-baltica-mono-bazant-dla-kota-18","g":185.0,"n":2.0,"bestBefore":null},{"id":"mvd8ibw4-6","sku":"eu-purizon-purizon-original-adult-huehnerfilet-mit-wildschwein-tin","g":200.0,"n":1.0,"bestBefore":"2027-04-23"},{"id":"mvd8hyd8-5","sku":"eu-mjamjam-purer-fleischgenuss-leckeres-wildschwein-pur-pouch","g":125.0,"n":1.0,"bestBefore":"2028-09-10"},{"id":"mvd8hrs5-4","sku":"eu-mjamjam-quetschie-schmackhafter-truthahn-an-leckeren-moehrchen-pouch","g":125.0,"n":1.0,"bestBefore":"2028-04-26"},{"id":"mvd8he11-3","sku":"eu-mjamjam-quetschie-chicks-friends-koestliches-huhn-an-feinen-moehrchen","g":125.0,"n":1.0,"bestBefore":"2028-08-27"},{"id":"mvd8gsv8-2","sku":"eu-mjamjam-quetschie-chicks-friends-schmackhaftes-huehnchen-an-geduenste","g":125.0,"n":1.0,"bestBefore":"2027-04-29"},{"id":"mvd8gosb-1","sku":"eu-mjamjam-quetschie-chicks-friends-saftiges-huehnchen-an-gedaempftem-sp","g":125.0,"n":1.0,"bestBefore":"2027-04-29"},{"id":"mvac6xd7-3","sku":"halo-classic-cn-made-senior-chicken-dry","g":2500.0,"n":1.0,"bestBefore":null},{"id":"mvacyxd8-6","sku":"eu-mjamjam-duo-von-saftigem-huehnchen-kaninchen-an-gedaempftem-kuerbis-t","g":400.0,"n":1.0,"bestBefore":"2030-03-31"},{"id":"mvacylpt-5","sku":"eu-mjamjam-purer-fleischgenuss-delikates-kaenguru-pur-tin","g":400.0,"n":1.0,"bestBefore":"2030-03-26"},{"id":"mvack6pw-4","sku":"eu-goddess-chicken-fillet","g":85.0,"n":1.0,"bestBefore":"2028-05-09"},{"id":"mv9rvsx3-5","sku":"eu-purizon-purizon-original-adult-huehnerfilet-mit-lachs-tin","g":200.0,"n":1.0,"bestBefore":"2027-07-16"},{"id":"mv9o8ndc-4","sku":"eu-mjamjam-duett-huehnchen-filet-kuesst-rind-tin","g":390.0,"n":1.0,"bestBefore":"2029-09-26"},{"id":"mv944atw-b","sku":"eu-mjamjam-senior-saftiges-huehnchen-tin","g":400.0,"n":1.0,"bestBefore":"2027-12-30"},{"id":"mv943fgf-a","sku":"eu-betty-s-landhauskueche-senior-huehnchen-mit-kuerbis-und-lachsoel-tin","g":400.0,"n":1.0,"bestBefore":"2029-10-15"},{"id":"mv7zkd9e-6","sku":"eu-venandi-animal-huhn-kaninchen-tin","g":400.0,"n":1.0,"bestBefore":"2029-12-14"},{"id":"mv7zjz9h-5","sku":"eu-venandi-animal-pute-als-monoprotein-tin","g":400.0,"n":1.0,"bestBefore":"2028-06-18"},{"id":"mv7zi7dt-4","sku":"eu-venandi-animal-kitten-huhn-mit-lachsoel-tin","g":400.0,"n":1.0,"bestBefore":"2028-06-18"},{"id":"mv7gius1-2","sku":"eu-mjamjam-insekt-mit-vorzueglichem-kalb-tin","g":200.0,"n":1.0,"bestBefore":"2028-03-08"},{"id":"mv6vz3qe-a","sku":"eu-goddess-turkey-guineafowl","g":85.0,"n":1.0,"bestBefore":"2029-03-04"},{"id":"mv6vz04n-9","sku":"eu-goddess-chicken-poultry","g":85.0,"n":1.0,"bestBefore":"2028-05-09"},{"id":"mv6vymty-8","sku":"eu-goddess-duck-chicken","g":85.0,"n":1.0,"bestBefore":"2029-02-25"},{"id":"mv6vyf75-7","sku":"eu-goddess-poultry-pheasant","g":85.0,"n":1.0,"bestBefore":"2029-02-25"},{"id":"mv6vxlhz-6","sku":"eu-granatapet-pferd-huhn-pouch","g":85.0,"n":2.0,"bestBefore":"2029-06-08"},{"id":"mv6vxcyf-5","sku":"eu-granatapet-huhn-kaninchen-pouch","g":85.0,"n":2.0,"bestBefore":"2029-06-08"},{"id":"mv6vx205-4","sku":"eu-granatapet-ente-huhn-pouch","g":85.0,"n":1.0,"bestBefore":"2029-06-01"},{"id":"mv6m8uvx-3","sku":"eu-mjamjam-vorzuegliches-kalb-und-leckerer-truthahn-an-feinen-moehrchen-tin","g":400.0,"n":1.0,"bestBefore":"2029-03-20"},{"id":"mv3omgp1-4","sku":"eu-natural-trail-monoprotein-boar","g":185.0,"n":1.0,"bestBefore":"2029-06-11"},{"id":"mv0bswfj-5","sku":"eu-betty-s-landhauskueche-mit-kaenguru-kartoffel-tin","g":200.0,"n":1.0,"bestBefore":"2029-12-18"},{"id":"mv0bskk1-4","sku":"eu-betty-s-landhauskueche-huhn-forelle-200g-tin","g":200.0,"n":2.0,"bestBefore":"2029-09-12"},{"id":"mv0bsbec-3","sku":"eu-betty-s-landhauskueche-rind-pur-mit-leinoel-tin","g":200.0,"n":2.0,"bestBefore":"2029-09-11"},{"id":"muuxjxdd-2","sku":"eu-mjamjam-vorzuegliches-kalb-und-leckerer-truthahn-an-feinen-moehrchen-tin","g":200.0,"n":1.0,"bestBefore":"2029-10-24"},{"id":"muuxjsat-1","sku":"eu-mjamjam-mahlzeit-mit-leckeren-herzen-tin","g":200.0,"n":2.0,"bestBefore":"2030-03-23"},{"id":"mutgyyg5-2","sku":"eu-mjamjam-delizioeses-rentier-mit-huehnchen-an-leckeren-moehrchen-pouch","g":400.0,"n":3.0,"bestBefore":"2030-03-27"},{"id":"muo3ta3e-3","sku":"eu-mjamjam-duett-huehnchen-filet-kuesst-pferd-tin","g":390.0,"n":1.0,"bestBefore":"2029-09-28"},{"id":"mumu3bu1-4","sku":"eu-betty-s-landhauskueche-mit-ente-tin","g":200.0,"n":1.0,"bestBefore":"2029-10-30"},{"id":"mumu2lio-3","sku":"eu-betty-s-landhauskueche-mit-truthahn-borretschoel-tin","g":200.0,"n":1.0,"bestBefore":"2029-12-11"},{"id":"muk47g75-5","sku":"eu-mjamjam-duett-huehnchen-filet-kuesst-rind-tin","g":390.0,"n":2.0,"bestBefore":"2029-08-28"},{"id":"muk46xxi-4","sku":"eu-mjamjam-duett-huehnchen-filet-kuesst-pute-tin","g":390.0,"n":2.0,"bestBefore":"2030-03-02"},{"id":"muk4631a-3","sku":"eu-betty-s-landhauskueche-rind-pur-mit-leinoel-tin","g":200.0,"n":1.0,"bestBefore":"2029-09-11"},{"id":"muk44kvr-2","sku":"eu-betty-s-landhauskueche-pferd-pur-borretschoel-200g-tin","g":400.0,"n":3.0,"bestBefore":"2030-03-30"},{"id":"mujdpcte-c","sku":"eu-betty-s-landhauskueche-mit-kaenguru-kartoffel-tin","g":200.0,"n":1.0,"bestBefore":"2029-12-18"},{"id":"mujdp7f6-b","sku":"eu-betty-s-landhauskueche-huhn-und-fasan-mit-borretschoel-tin","g":200.0,"n":1.0,"bestBefore":"2030-02-24"},{"id":"mujdnxbp-8","sku":"eu-betty-s-landhauskueche-fuer-kitten-huehnchen-mit-pute-tin","g":200.0,"n":1.0,"bestBefore":"2029-09-18"},{"id":"mujcquwt-6","sku":"eu-kittycat-ente","g":85.0,"n":1.0,"bestBefore":null},{"id":"mujaupzj-5","sku":"eu-mjamjam-leckeres-rind-an-gedaempftem-kuerbis-tin","g":85.0,"n":2.0,"bestBefore":"2030-02-17"},{"id":"muc6bwt1-1","sku":"eu-catz-finefood-n-409-pute-huhn-kaninchen-in-jelly-pouch","g":85.0,"n":6.0,"bestBefore":"2028-08-02"},{"id":"mub6ietp-6","sku":"eu-wildes-land-fasan-und-huhn-tin","g":200.0,"n":1.0,"bestBefore":"2027-08-02"},{"id":"mub4w59n-4","sku":"eu-catz-finefood-n-15-huhn-fasan-800-g-tin-tin","g":85.0,"n":2.0,"bestBefore":"2028-09-28"},{"id":"mu6hmd0r-4","sku":"eu-purizon-purizon-original-adult-huehnerfilet-mit-wildschwein-tin","g":200.0,"n":2.0,"bestBefore":"2027-07"},{"id":"mu3zyp5q-j","sku":"eu-purizon-purizon-original-adult-huehnerfilet-mit-wildschwein-tin","g":200.0,"n":3.0,"bestBefore":"2027-04"},{"id":"mu6hlq1c-3","sku":"usr-399bedb5c9c84dcc","g":400.0,"n":1.0,"bestBefore":"2026-12-21"},{"id":"mu6hl5jp-2","sku":"eu-mjamjam-purer-fleischgenuss-delikates-kaenguru-pur-tin","g":400.0,"n":3.0,"bestBefore":"2029-09-08"},{"id":"mu4wsrvk-1","sku":"eu-granatapet-no-9-fasan-kaninchen-tin","g":200.0,"n":4.0,"bestBefore":"2029-04-17"},{"id":"mu41rgvd-x","sku":"eu-mjamjam-herzhaftes-wild-kaninchen-mit-fruchtigen-heidelbeeren-pouch","g":300.0,"n":3.0,"bestBefore":"2028-12-02"},{"id":"mu40j1nm-s","sku":"eu-tundra-pute-pur","g":200.0,"n":1.0,"bestBefore":"2028-10-29"},{"id":"mu40emtd-p","sku":"eu-mac-s-cat-kitten-kalb-huehnerherzen-tin","g":200.0,"n":1.0,"bestBefore":"2028-12-12"},{"id":"mu40194i-n","sku":"eu-granatapet-no-3-wild-huhn-tin","g":200.0,"n":1.0,"bestBefore":"2028-01-28"},{"id":"mu400wso-m","sku":"eu-fellicita-katzennassfutter-huhn-pute-und-ente-fuer-adulte-katzen-tin","g":200.0,"n":1.0,"bestBefore":"2029-09-14"},{"id":"mu3zzsfj-l","sku":"eu-wildes-land-kaninchen-und-huhn-mit-disteloel-tin","g":200.0,"n":5.0,"bestBefore":"2027-08-02"},{"id":"mu3zwtgm-i","sku":"eu-leonardo-huhn-mit-spinat-tin","g":200.0,"n":5.0,"bestBefore":"2030-05-11"},{"id":"mu3zvj6h-h","sku":"eu-mjamjam-duo-von-zarter-ente-saftigem-huehnchen-an-moehrchen-tin","g":200.0,"n":1.0,"bestBefore":"2029-10-27"},{"id":"mu3zu99v-g","sku":"eu-mjamjam-gute-pute-an-gedaempftem-kuerbis-tin","g":200.0,"n":1.0,"bestBefore":"2029-02-11"},{"id":"mu3zrrte-e","sku":"eu-mjamjam-duo-von-saftigem-huehnchen-kaninchen-an-gedaempftem-kuerbis-t","g":200.0,"n":5.0,"bestBefore":"2030-02"},{"id":"mu3zrdyt-d","sku":"eu-mjamjam-schmackhafter-truthahn-an-leckeren-moehrchen-tin","g":200.0,"n":6.0,"bestBefore":"2030-02-23"},{"id":"mu3zqxev-c","sku":"eu-mjamjam-kitten-saftiges-huehnchen-mit-lachsoel-tin","g":200.0,"n":1.0,"bestBefore":null},{"id":"mu3zqfqn-b","sku":"eu-catz-finefood-n-3-gefluegel-800-g-tin-tin","g":200.0,"n":2.0,"bestBefore":null},{"id":"mu3zo8ou-a","sku":"eu-mjamjam-kulinarischer-hirsch-und-truthahn-an-frischen-cranberries-pou","g":300.0,"n":5.0,"bestBefore":"2027-02-12"},{"id":"mu3zn5du-9","sku":"eu-mjamjam-quetschie-chicks-friends-leckeres-huehnchen-an-fruchtigen-bir","g":300.0,"n":6.0,"bestBefore":"2028-08-26"},{"id":"mu3zmnee-8","sku":"eu-betty-s-landhauskueche-gefluegel-pur-tin","g":200.0,"n":4.0,"bestBefore":null},{"id":"mu3zl9oi-7","sku":"eu-catz-finefood-n-25-huhn-thunfisch-800-g-tin-tin","g":200.0,"n":2.0,"bestBefore":null},{"id":"mu3zkav5-6","sku":"eu-betty-s-landhauskueche-mit-kaenguru-kartoffel-tin","g":200.0,"n":1.0,"bestBefore":"2030-02-24"},{"id":"mu3zk2gb-4","sku":"eu-betty-s-landhauskueche-huhn-und-fasan-mit-borretschoel-tin","g":200.0,"n":1.0,"bestBefore":"2029-10-29"},{"id":"mu3zjwtu-3","sku":"eu-betty-s-landhauskueche-huhn-pur-borretschoel-tin","g":200.0,"n":7.0,"bestBefore":"2029-11-05"},{"id":"mu3zeg90-2","sku":"eu-catz-finefood-n-17-gefluegel-garnelen-800-g-tin-tin","g":200.0,"n":2.0,"bestBefore":null},{"id":"mu2s1xtm-4","sku":"eu-granatapet-no-8-fasan-ente-mit-huhn-tin","g":200.0,"n":5.0,"bestBefore":"2029-04-13"},{"id":"mu2s0sqo-2","sku":"eu-granatapet-huhn-pur-pouch-85g","g":85.0,"n":4.0,"bestBefore":"2029-04-14"},{"id":"mu2s0gul-1","sku":"eu-granatapet-no-5-huhn-pur-tin","g":200.0,"n":5.0,"bestBefore":"2029-06-01"},{"id":"mu0whmhp-4","sku":"eu-catz-finefood-n-413-huhn-thunfisch-in-jelly-pouch","g":85.0,"n":9.0,"bestBefore":null},{"id":"mu1b1wqy-2","sku":"eu-catz-finefood-n-15-huhn-fasan-800-g-tin-tin","g":200.0,"n":2.0,"bestBefore":null},{"id":"mu0whony-5","sku":"eu-catz-finefood-n-409-pute-huhn-kaninchen-in-jelly-pouch","g":85.0,"n":5.0,"bestBefore":"2028-12-08"},{"id":"mu0whbxf-1","sku":"eu-catz-finefood-n-5-lachs-gefluegel-tin","g":200.0,"n":1.0,"bestBefore":null},{"id":"mu0vjf2r-1","sku":"eu-catz-finefood-n-403-huhn-in-jelly-pouch","g":85.0,"n":23.0,"bestBefore":"2029-08-21"}],"open":[],"logs":[{"date":"2026-10-21","sku":"eu-granatapet-no-5-huhn-pur-tin","g":30.0,"note":""},{"date":"2026-10-20","sku":"eu-granatapet-no-5-huhn-pur-tin","g":50.0,"note":""},{"date":"2026-10-20","sku":"eu-mjamjam-kulinarischer-hirsch-und-truthahn-an-frischen-cranberries-pou","g":45.0,"note":""},{"date":"2026-10-18","sku":"eu-mjamjam-kulinarischer-hirsch-und-truthahn-an-frischen-cranberries-pou","g":45.0,"note":""},{"date":"2026-10-18","sku":"eu-mjamjam-kulinarischer-hirsch-und-truthahn-an-frischen-cranberries-pou","g":30.0,"note":""},{"date":"2026-10-17","sku":"eu-granatapet-ente-huhn-pouch","g":46.0,"note":""},{"date":"2026-10-17","sku":"eu-granatapet-ente-huhn-pouch","g":34.0,"note":""},{"date":"2026-10-16","sku":"eu-mjamjam-kulinarischer-hirsch-und-truthahn-an-frischen-cranberries-pou","g":36.0,"note":""},{"date":"2026-10-16","sku":"eu-betty-s-landhauskueche-huhn-pur-borretschoel-tin","g":30.0,"note":""},{"date":"2026-10-15","sku":"eu-mjamjam-kulinarischer-hirsch-und-truthahn-an-frischen-cranberries-pou","g":25.0,"note":""},{"date":"2026-10-15","sku":"eu-mjamjam-kulinarischer-hirsch-und-truthahn-an-frischen-cranberries-pou","g":45.0,"note":""},{"date":"2026-10-15","sku":"eu-mjamjam-kulinarischer-hirsch-und-truthahn-an-frischen-cranberries-pou","g":30.0,"note":""},{"date":"2026-10-14","sku":"eu-wildes-land-kaninchen-und-huhn-mit-disteloel-tin","g":120.0,"note":""},{"date":"2026-10-14","sku":"eu-wildes-land-kaninchen-und-huhn-mit-disteloel-tin","g":50.0,"note":""},{"date":"2026-10-13","sku":"eu-wildes-land-kaninchen-und-huhn-mit-disteloel-tin","g":20.0,"note":""},{"date":"2026-10-13","sku":"eu-betty-s-landhauskueche-huhn-pur-borretschoel-tin","g":30.0,"note":""},{"date":"2026-10-11","sku":"eu-mjamjam-vorzuegliches-kalb-und-leckerer-truthahn-an-feinen-moehrchen-tin","g":28.0,"note":""},{"date":"2026-10-10","sku":"eu-mjamjam-vorzuegliches-kalb-und-leckerer-truthahn-an-feinen-moehrchen-tin","g":50.0,"note":""},{"date":"2026-10-10","sku":"eu-mjamjam-vorzuegliches-kalb-und-leckerer-truthahn-an-feinen-moehrchen-tin","g":40.0,"note":""},{"date":"2026-10-09","sku":"eu-mjamjam-vorzuegliches-kalb-und-leckerer-truthahn-an-feinen-moehrchen-tin","g":50.0,"note":""},{"date":"2026-10-09","sku":"eu-mjamjam-vorzuegliches-kalb-und-leckerer-truthahn-an-feinen-moehrchen-tin","g":40.0,"note":""},{"date":"2026-10-08","sku":"eu-betty-s-landhauskueche-huhn-pur-borretschoel-tin","g":34.0,"note":""},{"date":"2026-10-08","sku":"eu-betty-s-landhauskueche-huhn-pur-borretschoel-tin","g":14.0,"note":""},{"date":"2026-10-08","sku":"eu-betty-s-landhauskueche-huhn-pur-borretschoel-tin","g":14.0,"note":""},{"date":"2026-10-07","sku":"eu-betty-s-landhauskueche-huhn-pur-borretschoel-tin","g":14.0,"note":""},{"date":"2026-10-07","sku":"eu-catz-finefood-n-5-lachs-gefluegel-tin","g":16.0,"note":""},{"date":"2026-10-06","sku":"eu-betty-s-landhauskueche-huhn-pur-borretschoel-tin","g":38.0,"note":""},{"date":"2026-10-06","sku":"eu-betty-s-landhauskueche-huhn-pur-borretschoel-tin","g":14.0,"note":""},{"date":"2026-10-05","sku":"eu-betty-s-landhauskueche-huhn-pur-borretschoel-tin","g":50.0,"note":""},{"date":"2026-10-05","sku":"eu-catz-finefood-n-5-lachs-gefluegel-tin","g":15.0,"note":""},{"date":"2026-10-04","sku":"eu-catz-finefood-n-5-lachs-gefluegel-tin","g":29.0,"note":""},{"date":"2026-10-02","sku":"eu-mjamjam-duett-huehnchen-filet-kuesst-pferd-tin","g":53.0,"note":""},{"date":"2026-10-02","sku":"eu-mjamjam-duett-huehnchen-filet-kuesst-pferd-tin","g":86.0,"note":""},{"date":"2026-10-02","sku":"eu-mjamjam-duett-huehnchen-filet-kuesst-pferd-tin","g":82.0,"note":""},{"date":"2026-10-01","sku":"eu-mjamjam-duett-huehnchen-filet-kuesst-pferd-tin","g":62.0,"note":""},{"date":"2026-10-01","sku":"eu-mjamjam-duett-huehnchen-filet-kuesst-pferd-tin","g":31.0,"note":""},{"date":"2026-10-01","sku":"eu-mjamjam-duett-huehnchen-filet-kuesst-pferd-tin","g":82.0,"note":""},{"date":"2026-09-30","sku":"eu-catz-finefood-n-5-lachs-gefluegel-tin","g":32.0,"note":""},{"date":"2026-09-29","sku":"eu-catz-finefood-n-5-lachs-gefluegel-tin","g":40.0,"note":""},{"date":"2026-09-28","sku":"eu-catz-finefood-n-5-lachs-gefluegel-tin","g":44.0,"note":""},{"date":"2026-09-26","sku":"eu-purizon-purizon-original-adult-huehnerfilet-mit-wildschwein-tin","g":16.0,"note":""},{"date":"2026-09-25","sku":"eu-catz-finefood-n-409-pute-huhn-kaninchen-in-jelly-pouch","g":43.0,"note":""},{"date":"2026-09-24","sku":"eu-catz-finefood-n-409-pute-huhn-kaninchen-in-jelly-pouch","g":43.0,"note":""},{"date":"2026-09-23","sku":"eu-catz-finefood-n-413-huhn-thunfisch-in-jelly-pouch","g":81.0,"note":""},{"date":"2026-09-23","sku":"eu-betty-s-landhauskueche-gefluegel-pur-tin","g":200.0,"note":""},{"date":"2026-09-23","sku":"eu-wildes-land-kaninchen-und-huhn-mit-disteloel-tin","g":200.0,"note":""},{"date":"2026-09-23","sku":"eu-mjamjam-herzhaftes-wild-kaninchen-mit-fruchtigen-heidelbeeren-pouch","g":300.0,"note":""},{"date":"2026-09-23","sku":"eu-purizon-purizon-original-adult-huehnerfilet-mit-wildschwein-tin","g":200.0,"note":""},{"date":"2026-09-20","sku":"eu-purizon-purizon-original-adult-huehnerfilet-mit-wildschwein-tin","g":35.0,"note":""},{"date":"2026-09-18","sku":"eu-mjamjam-herzhaftes-wild-kaninchen-mit-fruchtigen-heidelbeeren-pouch","g":31.0,"note":""},{"date":"2026-09-17","sku":"eu-purizon-purizon-original-adult-huehnerfilet-mit-wildschwein-tin","g":48.0,"note":""},{"date":"2026-09-16","sku":"eu-granatapet-huhn-pur-pouch-85g","g":43.0,"note":""},{"date":"2026-09-15","sku":"eu-granatapet-huhn-pur-pouch-85g","g":43.0,"note":""},{"date":"2026-09-14","sku":"eu-purizon-purizon-original-adult-huehnerfilet-mit-wildschwein-tin","g":50.0,"note":""},{"date":"2026-09-13","sku":"eu-mjamjam-herzhaftes-wild-kaninchen-mit-fruchtigen-heidelbeeren-pouch","g":51.0,"note":""},{"date":"2026-09-12","sku":"eu-purizon-purizon-original-adult-huehnerfilet-mit-wildschwein-tin","g":40.0,"note":""},{"date":"2026-09-11","sku":"eu-betty-s-landhauskueche-gefluegel-pur-tin","g":40.0,"note":""},{"date":"2026-09-03","sku":"eu-catz-finefood-n-413-huhn-thunfisch-in-jelly-pouch","g":26.0,"note":""},{"date":"2026-09-02","sku":"eu-catz-finefood-n-413-huhn-thunfisch-in-jelly-pouch","g":26.0,"note":""},{"date":"2026-09-01","sku":"eu-catz-finefood-n-403-huhn-in-jelly-pouch","g":26.0,"note":""},{"date":"2026-08-31","sku":"eu-catz-finefood-n-403-huhn-in-jelly-pouch","g":24.0,"note":""},{"date":"2026-08-30","sku":"eu-catz-finefood-n-403-huhn-in-jelly-pouch","g":31.0,"note":""}],"tx":[],"plan":[]};function def(){return JSON.parse(JSON.stringify(BUILTIN))}let S=JSON.parse(localStorage.getItem(K)||'null')||def();function sv(){localStorage.setItem(K,JSON.stringify(S))}function nm(id){let x=S.cat[id]||{brand:'未识别',name:id};return x.brand+' · '+x.name}function active(){return S.open.filter(x=>x.left>.5)}function groups(){let o={};S.batches.filter(x=>x.n>0).forEach(x=>{let k=x.sku+'|'+x.g;if(!o[k])o[k]={sku:x.sku,g:x.g,n:0};o[k].n+=x.n});return Object.values(o)}function deduct(id,g){let x=S.batches.find(x=>x.sku===id&&+x.g===+g&&x.n>0);if(!x)return false;x.n--;return true}function nut(id,g){let x=S.cat[id]||{},cal=x.kcal?g*x.kcal/100:null;return{cal,pm:cal&&x.p?cal*x.p/1000:null}}function metric(logs,end,n){let st=A(end,-n+1),kc=0,tc=0,pm=0,ug=0,tg=0;logs.filter(x=>x.date>=st&&x.date<=end).forEach(x=>{let z=nut(x.sku,+x.g);tg+=+x.g;if(z.cal){tc+=z.cal;if(z.pm){kc+=z.cal;pm+=z.pm}else ug+=+x.g}else ug+=+x.g});return{load:kc?pm/kc*1000:null,cov:tc?kc/tc:(tg?0:null),ug}}function plan(){
- let virtualOpen=active().map(x=>({...x})),stock=groups().map(x=>({...x})),logs=S.logs.map(x=>({...x})),out=[],simOpened=S.open.map(x=>({sku:x.sku,date:x.opened}));
- for(let i=0;i<30;i++){
-  let date=A(T(),i),need=S.set.target,eat=[],opened=[];
-  virtualOpen=virtualOpen.filter(x=>x.left>.5);
-  virtualOpen.sort((a,b)=>a.due.localeCompare(b.due)||a.left-b.left);
-  // First consume only enough from open cans to meet today; earliest deadline first.
-  for(const o of virtualOpen){if(need<=.5)break;let daysLeft=Math.max(1,Math.round((new Date(o.due+'T12:00:00+08:00')-new Date(date+'T12:00:00+08:00'))/86400000)+1),minDaily=o.left/daysLeft,take=Math.min(o.left,need,Math.max(minDaily,need/Math.max(1,virtualOpen.length)));if(take>.01){o.left-=take;need-=take;eat.push({sku:o.sku,g:take})}}
-  virtualOpen=virtualOpen.filter(x=>x.left>.5);
-  // Rolling 7-day variety target, but hard rules always win.
-  let weekStart=A(date,-6),weekOpened=simOpened.filter(x=>x.date>=weekStart&&x.date<=date),weekSkus=new Set(weekOpened.map(x=>x.sku));
-  let mustOpen=need>.5;
-  let mayAddVariety=!mustOpen&&weekSkus.size<S.set.wmin&&virtualOpen.length<Math.min(2,S.set.maxOpen)&&i%3===2;
-  if((mustOpen||mayAddVariety)&&virtualOpen.length<Math.min(2,S.set.maxOpen)&&weekSkus.size<S.set.wmax){
-   let candidates=stock.filter(x=>x.n>0).map(c=>({c,score:scoreCandidate(c,date,logs,weekSkus)})).sort((a,b)=>a.score-b.score);
-   let chosen=(candidates[0]&&candidates[0].c);
-   if(chosen){chosen.n--;let o={id:'v'+U(),sku:chosen.sku,left:chosen.g,opened:date,due:A(date,S.set.maxDays-1),frozen:true};virtualOpen.push(o);simOpened.push({sku:o.sku,date});opened.push({sku:o.sku,g:chosen.g});if(need>.5){let take=Math.min(need,o.left);o.left-=take;need-=take;eat.push({sku:o.sku,g:take})}}
-  }
-  // If existing open stock was split too conservatively, finish today's target without opening a third.
-  if(need>.5){virtualOpen.sort((a,b)=>a.due.localeCompare(b.due)||a.left-b.left);for(const o of virtualOpen){if(need<=.5)break;let take=Math.min(need,o.left);if(take>.01){o.left-=take;need-=take;eat.push({sku:o.sku,g:take})}}}
-  eat.forEach(x=>logs.push({date,sku:x.sku,g:x.g}));virtualOpen=virtualOpen.filter(x=>x.left>.5);
-  out.push({date,eat,opened,missing:Math.max(0,need),m7:metric(logs,date,7),m30:metric(logs,date,30),openCount:virtualOpen.length});
- }
- S.plan=out;sv();render();
+<style>
+:root{
+  --primary:#7568e8;
+  --primary-dark:#5548c5;
+  --purple:#eeeaff;
+  --pink:#ffeaf1;
+  --yellow:#fff4d7;
+  --green:#e8f8ef;
+  --blue:#e8f3ff;
+  --ink:#29263b;
+  --muted:#77758a;
+  --line:#ebe8f3;
+  --card:#ffffff;
+  --bg:#f7f6fc;
+  --danger:#c8415d;
+  --shadow:0 8px 28px rgba(54,44,120,.09);
 }
-function scoreCandidate(c,date,logs,weekSkus){let x=S.cat[c.sku]||{},z=0,recentSmall=logs.filter(l=>l.date>=A(date,-6)&&l.date<=date&&(S.cat[l.sku]||{}).size===85).reduce((a,l)=>a+l.g,0);if(x.grade==='GX')z+=800;if(x.grade==='G4')z+=350;if(c.g===85){z+=900;if(recentSmall>=85)z+=5000}else if(c.g>=180&&c.g<=220)z-=450;else if(c.g>=300)z-=220;if(weekSkus.has(c.sku))z+=2000;z-=Math.min(c.n,10)*25;let test=[...logs,{date,sku:c.sku,g:Math.min(S.set.target,c.g)}],m7=metric(test,date,7),m30=metric(test,date,30);if(m7.load)z+=Math.abs(m7.load-1800)*1.5;if(m30.load)z+=Math.abs(m30.load-1800);let g4=test.filter(l=>l.date>=A(date,-29)&&(S.cat[l.sku]||{}).grade==='G4').reduce((a,l)=>a+(nut(l.sku,l.g).cal||0),0),tot=test.filter(l=>l.date>=A(date,-29)).reduce((a,l)=>a+(nut(l.sku,l.g).cal||0),0);if(x.grade==='G4'&&tot&&g4/tot>.2)z+=9000;return z}
-function pack(id){let z=S.cat[id]||{};if(z.image)return `<img class="pack" src="${z.image}" alt="${nm(id)}" onerror="this.outerHTML='<div class=\"pack\">待补图</div>'">`;return '<div class="pack">待补图</div>'}function render(){stockN.textContent=S.batches.reduce((a,x)=>a+Math.max(0,x.n),0);openN.textContent=active().length+'/'+S.set.maxOpen;let p=S.plan[0];today.innerHTML=p?(p.opened.map(x=>`<div class="day new withpack">${pack(x.sku)}<div><b>建议开：${nm(x.sku)}</b><div>${x.g}g · ${(S.cat[x.sku]||{}).grade||'GX'}</div></div></div>`).join('')+p.eat.map(x=>`<div class="day">吃 ${Math.round(x.g)}g · ${nm(x.sku)}</div>`).join('')):'暂无计划';opens.innerHTML=active().length?active().map(x=>`<div class="open withpack">${pack(x.sku)}<div><b>${nm(x.sku)}</b><div>剩${Math.round(x.left)}g · ${x.due}前 · ${x.frozen?'❄️已冷冻':'未冷冻'}</div></div></div>`).join(''):'<p class="muted">暂无已开罐</p>';let all=[...S.logs,...S.plan.flatMap(p=>p.eat.map(x=>({date:p.date,sku:x.sku,g:x.g})))],m7=metric(all,A(T(),6),7),m30=metric(all,A(T(),29),30);p7.textContent=m7.load?Math.round(m7.load):'--';p30.textContent=m30.load?Math.round(m30.load):'--';c7.textContent='覆盖率 '+(m7.cov==null?'--':Math.round(m7.cov*100)+'%');c30.textContent='覆盖率 '+(m30.cov==null?'--':Math.round(m30.cov*100)+'%');days.innerHTML=S.plan.map(x=>`<div class="day ${x.opened.length?'new':''}"><div class="row between"><b>${x.date}</b><span class="pill">${x.opened.length?'新开'+x.opened.length:'用已开'}</span></div>${x.opened.map(y=>`<div>开：${nm(y.sku)} ${y.g}g</div>`).join('')}${x.eat.map(y=>`<div class="muted">吃${Math.round(y.g)}g · ${nm(y.sku)} · ${(S.cat[y.sku]||{}).grade||'GX'}</div>`).join('')}${x.missing>.5?`<div class="warn">缺${Math.round(x.missing)}g，未突破2个开罐上限</div>`:''}<div class="muted">当日结束未吃完：${x.openCount}/2</div></div>`).join('');let qq=(q.value||'').toLowerCase(),gf=(document.getElementById('gradeFilter')||{}).value||'',sf=(document.getElementById('sizeFilter')||{}).value||'';inventory.innerHTML=groups().filter(x=>{let c=S.cat[x.sku]||{},hay=(nm(x.sku)+' '+x.sku+' '+(c.grade||'')+' '+x.g+'g').toLowerCase();return hay.includes(qq)&&(!gf||(c.grade||'GX')===gf)&&(!sf||String(x.g)===sf)}).map(x=>`<div class="item row between"><div class="withpack" style="flex:1">${pack(x.sku)}<div><b>${nm(x.sku)}</b><div class="muted">${x.g}g · ${(S.cat[x.sku]||{}).grade||'GX'} · ${(S.cat[x.sku]||{}).p||'磷未知'}</div><div class="muted">SKU：${x.sku}</div><div class="actions" style="margin-top:6px"><button class="sec" onclick="changeStockQty('${x.sku.split("'").join("\\'")}',${x.g},-1)">－1</button><button class="sec" onclick="changeStockQty('${x.sku.split("'").join("\\'")}',${x.g},1)">＋1</button></div></div></div><b>${x.n}</b></div>`).join('');history.innerHTML=[...S.logs.map(x=>({...x,type:'实际摄入'})),...S.tx].sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<div class="item"><b>${x.date} · ${x.type||''}</b><div>${nm(x.sku)} · ${x.g||''}g</div><div class="muted">${x.note||''}</div></div>`).join('')||'暂无记录';S.set=S.set||{target:80,maxDays:14,wmin:2,wmax:3,maxOpen:2};target.value=S.set.target||80;maxDays.value=S.set.maxDays||14;wmin.value=S.set.wmin||2;wmax.value=S.set.wmax||3;maxOpen.value=Math.min(2,S.set.maxOpen||2)}function changeStockQty(id,g,delta){let b=S.batches.find(x=>x.sku===id&&+x.g===+g);if(!b&&delta>0){b={id:U(),sku:id,g:+g,n:0};S.batches.push(b)}if(!b)return;b.n=Math.max(0,+b.n+delta);S.tx.push({date:T(),type:delta>0?'库存增加':'库存减少',sku:id,g:+g,n:Math.abs(delta)});sv();render()}let OPEN_ITEMS=[];function filterOpenSelect(){let kw=((document.getElementById('openSearch')||{}).value||'').toLowerCase(),a=OPEN_ITEMS.filter(x=>(nm(x.sku)+' '+x.sku+' '+x.g+'g').toLowerCase().includes(kw));openSku.innerHTML=a.map(x=>`<option value="${x.sku}|${x.g}">${nm(x.sku)}｜${x.g}g｜余${x.n}</option>`).join('');if(a.length)openG.value=a[0].g}function showOpen(){if(active().length>=S.set.maxOpen)return alert('已达同时已开上限');OPEN_ITEMS=groups();if(document.getElementById('openSearch'))openSearch.value='';let a=OPEN_ITEMS;openSku.innerHTML=a.map(x=>`<option value="${x.sku}|${x.g}">${nm(x.sku)}｜${x.g}g｜余${x.n}</option>`).join('');openG.value=(a[0]&&a[0].g)||'';openM.classList.add('on')}openSku.onchange=()=>openG.value=openSku.value.split('|')[1];function openSave(){let [id,g]=openSku.value.split('|');g=+g;if(!deduct(id,g))return alert('库存不足');S.open.push({id:U(),sku:id,left:+openG.value||g,opened:T(),due:A(T(),S.set.maxDays-1),frozen:freeze.checked});S.tx.push({date:T(),type:'开罐',sku:id,g:+openG.value||g});cm('openM');plan()}function showEat(){let a=active();if(!a.length)return alert('请先开罐');eatOpen.innerHTML=a.map(x=>`<option value="${x.id}">${nm(x.sku)}｜剩${Math.round(x.left)}g</option>`).join('');eatDate.value=T();eatG.value=Math.min(S.set.target,a[0].left);eatM.classList.add('on')}function eatSave(){let o=S.open.find(x=>x.id===eatOpen.value),g=+eatG.value;if(!o||g<=0||g>o.left)return alert('克数无效');o.left-=g;S.logs.push({date:eatDate.value,sku:o.sku,g,note:note.value});cm('eatM');plan()}function showAdd(){addM.classList.add('on')}function addSave(){let id='custom-'+U();S.cat[id]={id,brand:brand.value,name:food.value,size:+size.value,kcal:+kcal.value||null,p:+phos.value||null,grade:grade.value};S.batches.push({id:U(),sku:id,g:+size.value,n:+qty.value});cm('addM');plan()}function saveSet(){S.set={target:+target.value||80,maxDays:+maxDays.value||14,wmin:+wmin.value||2,wmax:+wmax.value||3,maxOpen:+maxOpen.value||2};plan()}function backup(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,2)],{type:'application/json'}));a.download='gulu_backup_'+T()+'.json';a.click()}function reset(){if(confirm('恢复内置的196件库存？当前浏览器记录会被覆盖。')){S=def();plan()}}function cm(id){document.getElementById(id).classList.remove('on')}document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button,.page').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.getElementById(b.dataset.p).classList.add('on');render()});if(!S.plan.length)plan();else render();
-</script></body></html>
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  min-height:100%;
+  background:var(--bg);
+}
+
+body{
+  margin:0;
+  padding:0 0 84px;
+  background:
+    radial-gradient(circle at 10% 0%,#eeeaff 0,transparent 28%),
+    radial-gradient(circle at 100% 10%,#ffeaf1 0,transparent 25%),
+    var(--bg);
+  color:var(--ink);
+  font-family:
+    -apple-system,BlinkMacSystemFont,
+    "PingFang SC","Microsoft YaHei",
+    sans-serif;
+}
+
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+button{
+  border:0;
+  cursor:pointer;
+}
+
+.app-header{
+  position:relative;
+  overflow:hidden;
+  color:#fff;
+  padding:24px 18px 28px;
+  background:
+    linear-gradient(135deg,#6759d7,#a18af5);
+  border-radius:0 0 28px 28px;
+  box-shadow:0 8px 24px rgba(91,76,199,.22);
+}
+
+.app-header:after{
+  content:"🐾";
+  position:absolute;
+  right:20px;
+  bottom:-15px;
+  font-size:76px;
+  opacity:.16;
+  transform:rotate(-12deg);
+}
+
+.header-top{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  position:relative;
+  z-index:1;
+}
+
+.cat-avatar{
+  width:54px;
+  height:54px;
+  display:grid;
+  place-items:center;
+  background:#ffffff30;
+  border:1px solid #ffffff50;
+  border-radius:19px;
+  font-size:31px;
+  box-shadow:inset 0 1px #ffffff50;
+}
+
+.app-header h1{
+  margin:0;
+  font-size:23px;
+  letter-spacing:.5px;
+}
+
+.app-header p{
+  margin:5px 0 0;
+  font-size:12px;
+  opacity:.88;
+}
+
+.header-status{
+  margin-top:18px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  position:relative;
+  z-index:1;
+}
+
+.header-pill{
+  padding:7px 10px;
+  border-radius:999px;
+  background:#ffffff22;
+  border:1px solid #ffffff38;
+  font-size:12px;
+}
+
+.wrap{
+  width:min(760px,100%);
+  margin:auto;
+  padding:14px;
+}
+
+.page{
+  display:none;
+  animation:fadeIn .2s ease;
+}
+
+.page.on{
+  display:block;
+}
+
+@keyframes fadeIn{
+  from{opacity:.3;transform:translateY(4px)}
+  to{opacity:1;transform:none}
+}
+
+.card{
+  background:var(--card);
+  border:1px solid #fff;
+  border-radius:22px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:var(--shadow);
+}
+
+.card-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.card-title h2{
+  margin:0;
+  font-size:17px;
+}
+
+.card-title small{
+  color:var(--muted);
+  font-size:11px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.kpi{
+  position:relative;
+  overflow:hidden;
+  border-radius:18px;
+  padding:15px;
+  background:var(--purple);
+}
+
+.kpi:nth-child(2){
+  background:var(--pink);
+}
+
+.kpi:nth-child(3){
+  background:var(--green);
+}
+
+.kpi:nth-child(4){
+  background:var(--yellow);
+}
+
+.kpi:after{
+  content:"🐾";
+  position:absolute;
+  right:8px;
+  bottom:2px;
+  opacity:.11;
+  font-size:36px;
+}
+
+.kpi strong{
+  display:block;
+  font-size:27px;
+  line-height:1.1;
+}
+
+.kpi span{
+  display:block;
+  margin-top:6px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.muted{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.btn-row{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  min-height:40px;
+  padding:10px 13px;
+  color:#fff;
+  background:var(--primary);
+  border-radius:13px;
+  font-weight:700;
+}
+
+.btn:hover{
+  background:var(--primary-dark);
+}
+
+.btn.secondary{
+  color:var(--primary-dark);
+  background:var(--purple);
+}
+
+.btn.green{
+  color:#26764b;
+  background:var(--green);
+}
+
+.btn.yellow{
+  color:#85601c;
+  background:var(--yellow);
+}
+
+.btn.danger{
+  color:#a42f48;
+  background:#ffe3e9;
+}
+
+.btn.full{
+  width:100%;
+}
+
+.notice{
+  padding:12px 14px;
+  border-radius:15px;
+  background:var(--yellow);
+  color:#765c27;
+  font-size:12px;
+  line-height:1.65;
+}
+
+.notice.info{
+  background:var(--blue);
+  color:#38618b;
+}
+
+.notice.good{
+  background:var(--green);
+  color:#31744e;
+}
+
+.plan-item,
+.open-item,
+.inventory-item,
+.history-item,
+.weight-item{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:12px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.plan-item:last-child,
+.open-item:last-child,
+.inventory-item:last-child,
+.history-item:last-child,
+.weight-item:last-child{
+  border-bottom:0;
+}
+
+.food-image{
+  width:56px;
+  height:68px;
+  flex:none;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border-radius:12px 12px 15px 15px;
+  color:#6557bd;
+  background:
+    linear-gradient(145deg,#fff,#e9e5ff);
+  border:1px solid #dcd5f5;
+  box-shadow:inset 0 6px #cfc5f2;
+  font-size:25px;
+  text-align:center;
+}
+
+.food-image img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.item-main{
+  min-width:0;
+  flex:1;
+}
+
+.item-main b{
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:14px;
+}
+
+.item-main small{
+  display:block;
+  margin-top:5px;
+  color:var(--muted);
+  line-height:1.45;
+}
+
+.tag{
+  display:inline-block;
+  margin:3px 4px 0 0;
+  padding:3px 7px;
+  border-radius:999px;
+  color:#5e4bbd;
+  background:var(--purple);
+  font-size:10px;
+}
+
+.tag.green{
+  color:#28734a;
+  background:var(--green);
+}
+
+.tag.orange{
+  color:#93621b;
+  background:var(--yellow);
+}
+
+.tag.red{
+  color:#a7364e;
+  background:#ffe3e9;
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  padding:11px 12px;
+  border:1px solid #ddd9eb;
+  border-radius:12px;
+  outline:0;
+  color:var(--ink);
+  background:#fff;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px #7568e822;
+}
+
+label{
+  display:block;
+  margin:10px 0 5px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+}
+
+.empty{
+  padding:24px 10px;
+  color:var(--muted);
+  text-align:center;
+  font-size:13px;
+}
+
+.empty .emoji{
+  display:block;
+  margin-bottom:7px;
+  font-size:32px;
+}
+
+.progress{
+  height:9px;
+  overflow:hidden;
+  margin-top:8px;
+  border-radius:999px;
+  background:#eceaf5;
+}
+
+.progress i{
+  display:block;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,var(--primary),#b293ff);
+}
+
+.bottom-nav{
+  position:fixed;
+  z-index:10;
+  right:0;
+  bottom:0;
+  left:0;
+  display:flex;
+  width:min(760px,100%);
+  margin:auto;
+  padding:7px 8px calc(7px + env(safe-area-inset-bottom));
+  background:#fff;
+  border-top:1px solid var(--line);
+  box-shadow:0 -6px 20px rgba(55,45,120,.08);
+}
+
+.bottom-nav button{
+  flex:1;
+  padding:7px 2px;
+  color:#9290a2;
+  background:transparent;
+  border-radius:12px;
+  font-size:11px;
+  line-height:1.35;
+}
+
+.bottom-nav button.on{
+  color:var(--primary);
+  background:var(--purple);
+  font-weight:700;
+}
+
+.modal{
+  position:fixed;
+  z-index:30;
+  inset:0;
+  display:none;
+  align-items:flex-end;
+  background:#19152d99;
+}
+
+.modal.on{
+  display:flex;
+}
+
+.sheet{
+  width:min(700px,100%);
+  max-height:92vh;
+  overflow:auto;
+  margin:auto;
+  padding:19px;
+  background:#fff;
+  border-radius:25px 25px 0 0;
+  box-shadow:0 -10px 40px #20164b33;
+}
+
+.sheet h2{
+  margin:0 0 15px;
+  font-size:19px;
+}
+
+.sheet-actions{
+  display:flex;
+  gap:8px;
+  margin-top:16px;
+}
+
+.sheet-actions>*{
+  flex:1;
+}
+
+.toast{
+  position:fixed;
+  z-index:50;
+  right:16px;
+  bottom:88px;
+  left:16px;
+  display:none;
+  padding:13px 15px;
+  color:#fff;
+  background:#302b4b;
+  border-radius:14px;
+  box-shadow:var(--shadow);
+  font-size:13px;
+  text-align:center;
+}
+
+.toast.on{
+  display:block;
+}
+
+@media(max-width:420px){
+  .wrap{
+    padding:11px;
+  }
+
+  .card{
+    padding:14px;
+    border-radius:19px;
+  }
+
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .food-image{
+    width:50px;
+    height:62px;
+  }
+}
+</style>
+</head>
+
+<body>
+<header class="app-header">
+  <div class="header-top">
+    <div class="cat-avatar">🐱</div>
+    <div>
+      <h1>咕噜罐头管家</h1>
+      <p>给小猫安排好每一口湿粮</p>
+    </div>
+  </div>
+
+  <div class="header-status">
+    <span class="header-pill">7岁 · 已绝育</span>
+    <span class="header-pill">减肥模式</span>
+    <span class="header-pill">目标约80g/天</span>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section id="home" class="page on">
+  <div class="grid">
+    <div class="kpi">
+      <strong id="stockCount">0</strong>
+      <span>未开封罐数</span>
+    </div>
+    <div class="kpi">
+      <strong id="openCount">0/2</strong>
+      <span>当前已开</span>
+    </div>
+    <div class="kpi">
+      <strong id="todayGrams">0g</strong>
+      <span>今日已记录</span>
+    </div>
+    <div class="kpi">
+      <strong id="weightNow">4.90kg</strong>
+      <span>最近体重</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <h2>🐾 今日喂食建议</h2>
+      <button class="btn secondary" onclick="rebuildPlan()">重新计算</button>
+    </div>
+
+    <div id="todayPlan"></div>
+
+    <div class="btn-row" style="margin-top:12px">
+      <button class="btn full" onclick="openEatModal()">记录实际摄入</button>
+      <button class="btn secondary full" onclick="openManualModal()">调整今日计划</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <h2>🥫 当前已开罐</h2>
+      <button class="btn" onclick="openCanModal()">+ 开罐</button>
+    </div>
+    <div id="openList"></div>
+  </div>
+
+  <div class="notice">
+    <b>喂食规则：</b>优先使用实际已开罐；普通罐头开封后14天内吃完；同时最多2个已开罐；默认新开罐间隔至少2天。如果已开罐不足以满足今日目标，程序会说明为什么需要开新罐。
+  </div>
+</section>
+
+<section id="plan" class="page">
+  <div class="card">
+    <div class="card-title">
+      <h2>📅 未来30天计划</h2>
+      <button class="btn secondary" onclick="rebuildPlan()">重算</button>
+    </div>
+    <div id="planList"></div>
+  </div>
+</section>
+
+<section id="nutrition" class="page">
+  <div class="card">
+    <div class="card-title">
+      <h2>🧪 营养统计</h2>
+      <small>实际摄入，不含未来计划</small>
+    </div>
+
+    <div class="grid">
+      <div class="kpi">
+        <strong id="nCal">--</strong>
+        <span>平均 kcal/天</span>
+      </div>
+      <div class="kpi">
+        <strong id="nCa">--</strong>
+        <span>钙 mg/天</span>
+      </div>
+      <div class="kpi">
+        <strong id="nP">--</strong>
+        <span>磷 mg/天</span>
+      </div>
+      <div class="kpi">
+        <strong id="nMg">--</strong>
+        <span>镁 mg/天</span>
+      </div>
+    </div>
+
+    <div id="nutritionInfo" class="notice info" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <h2>📊 数据覆盖率</h2>
+      <small>过去30天</small>
+    </div>
+    <div id="coverage"></div>
+  </div>
+</section>
+
+<section id="inventory" class="page">
+  <div class="card">
+    <div class="card-title">
+      <h2>📦 现有库存</h2>
+      <button class="btn" onclick="openFoodModal()">+ 入库</button>
+    </div>
+
+    <input id="searchInput" placeholder="搜索品牌、口味或SKU" oninput="renderInventory()">
+    <div id="inventoryList"></div>
+  </div>
+</section>
+
+<section id="history" class="page">
+  <div class="card">
+    <div class="card-title">
+      <h2>✍️ 实际记录</h2>
+      <button class="btn green" onclick="openWeightModal()">记录体重</button>
+    </div>
+
+    <div id="historyList"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <h2>⚖️ 体重趋势</h2>
+      <small>减肥模式</small>
+    </div>
+    <div id="weightList"></div>
+  </div>
+</section>
+
+<section id="settings" class="page">
+  <div class="card">
+    <div class="card-title">
+      <h2>⚙️ 喂食设置</h2>
+      <span>🐾</span>
+    </div>
+
+    <div class="form-grid">
+      <div>
+        <label>每日目标湿粮(g)</label>
+        <input id="setTarget" type="number" min="1">
+      </div>
+      <div>
+        <label>同时最多已开罐数</label>
+        <input id="setMaxOpen" type="number" min="1" max="3">
+      </div>
+      <div>
+        <label>开封后最多天数</label>
+        <input id="setMaxDays" type="number" min="1">
+      </div>
+      <div>
+        <label>新罐最小间隔天数</label>
+        <input id="setGap" type="number" min="0">
+      </div>
+      <div>
+        <label>每周最少品种</label>
+        <input id="setWeekMin" type="number" min="1">
+      </div>
+      <div>
+        <label>每周最多品种</label>
+        <input id="setWeekMax" type="number" min="1">
+      </div>
+    </div>
+
+    <button class="btn full" style="margin-top:14px" onclick="saveSettings()">保存并重算</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <h2>💾 数据管理</h2>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn secondary" onclick="exportData()">导出备份</button>
+      <button class="btn secondary" onclick="document.getElementById('importFile').click()">导入备份</button>
+      <button class="btn danger" onclick="resetData()">恢复示例数据</button>
+    </div>
+
+    <input id="importFile" type="file" accept=".json" style="display:none" onchange="importData(event)">
+
+    <div class="notice info" style="margin-top:13px">
+      图片请放入仓库的 <b>images/</b> 文件夹，然后在食品资料中填写相对路径，例如：
+      <b>images/granatapet-no5.jpg</b>。
+    </div>
+  </div>
+</section>
+
+</main>
+
+<nav class="bottom-nav">
+  <button class="on" data-page="home">🐱<br>今日</button>
+  <button data-page="plan">📅<br>计划</button>
+  <button data-page="nutrition">🧪<br>营养</button>
+  <button data-page="inventory">📦<br>库存</button>
+  <button data-page="history">✍️<br>记录</button>
+  <button data-page="settings">⚙️<br>设置</button>
+</nav>
+
+<!-- 开罐弹窗 -->
+<div id="canModal" class="modal">
+  <div class="sheet">
+    <h2>🥫 打开新罐</h2>
+
+    <label>选择食品</label>
+    <select id="canFood"></select>
+
+    <label>本次打开重量(g)</label>
+    <input id="canGrams" type="number">
+
+    <label>开罐日期</label>
+    <input id="canDate" type="date">
+
+    <label style="display:flex;align-items:center;gap:8px">
+      <input id="canFrozen" type="checkbox" style="width:auto">
+      已分装冷冻
+    </label>
+
+    <div class="sheet-actions">
+      <button class="btn" onclick="saveOpenedCan()">确认开罐</button>
+      <button class="btn secondary" onclick="closeModal('canModal')">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- 实际摄入弹窗 -->
+<div id="eatModal" class="modal">
+  <div class="sheet">
+    <h2>🍽️ 记录实际摄入</h2>
+
+    <label>日期</label>
+    <input id="eatDate" type="date">
+
+    <label>使用哪个已开罐</label>
+    <select id="eatCan"></select>
+
+    <label>实际摄入克数</label>
+    <input id="eatGrams" type="number" min="0.1">
+
+    <label>备注</label>
+    <textarea id="eatNote" rows="2" placeholder="例如：早晚分两次"></textarea>
+
+    <div class="sheet-actions">
+      <button class="btn" onclick="saveEating()">保存记录</button>
+      <button class="btn secondary" onclick="closeModal('eatModal')">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- 今日调整 -->
+<div id="manualModal" class="modal">
+  <div class="sheet">
+    <h2>🔄 调整今日计划</h2>
+
+    <label>选择食品</label>
+    <select id="manualFood"></select>
+
+    <label>计划使用克数</label>
+    <input id="manualGrams" type="number" value="80">
+
+    <label style="display:flex;align-items:center;gap:8px">
+      <input id="manualOpen" type="checkbox" style="width:auto">
+      允许今天开新罐
+    </label>
+
+    <div class="sheet-actions">
+      <button class="btn" onclick="saveManualPlan()">保存调整</button>
+      <button class="btn secondary" onclick="closeModal('manualModal')">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- 新增食品 -->
+<div id="foodModal" class="modal">
+  <div class="sheet">
+    <h2>📦 新增库存食品</h2>
+
+    <div class="form-grid">
+      <div>
+        <label>品牌</label>
+        <input id="foodBrand">
+      </div>
+      <div>
+        <label>名称/口味</label>
+        <input id="foodName">
+      </div>
+      <div>
+        <label>规格(g)</label>
+        <input id="foodSize" type="number">
+      </div>
+      <div>
+        <label>数量</label>
+        <input id="foodQty" type="number" value="1">
+      </div>
+      <div>
+        <label>热量 kcal/100g</label>
+        <input id="foodKcal" type="number">
+      </div>
+      <div>
+        <label>等级</label>
+        <select id="foodGrade">
+          <option value="G1">G1</option>
+          <option value="G2">G2</option>
+          <option value="G3">G3</option>
+          <option value="G4">G4</option>
+          <option value="GX">待核实</option>
+        </select>
+      </div>
+      <div>
+        <label>钙 mg/1000kcal</label>
+        <input id="foodCa" type="number">
+      </div>
+      <div>
+        <label>磷 mg/1000kcal</label>
+        <input id="foodP" type="number">
+      </div>
+      <div>
+        <label>镁 mg/1000kcal</label>
+        <input id="foodMg" type="number">
+      </div>
+      <div>
+        <label>图片路径</label>
+        <input id="foodImage" placeholder="images/example.jpg">
+      </div>
+    </div>
+
+    <div class="sheet-actions">
+      <button class="btn" onclick="saveFood()">保存入库</button>
+      <button class="btn secondary" onclick="closeModal('foodModal')">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- 体重 -->
+<div id="weightModal" class="modal">
+  <div class="sheet">
+    <h2>⚖️ 记录体重</h2>
+
+    <label>日期</label>
+    <input id="weightDate" type="date">
+
+    <label>体重(kg)</label>
+    <input id="weightKg" type="number" step="0.01" value="4.9">
+
+    <div class="sheet-actions">
+      <button class="btn" onclick="saveWeight()">保存</button>
+      <button class="btn secondary" onclick="closeModal('weightModal')">取消</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const STORAGE_KEY = "caremycat-complete-v1";
+
+const today = () => {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+};
+
+function addDays(date, amount){
+  const d = new Date(date + "T12:00:00");
+  d.setDate(d.getDate() + amount);
+  return d.toISOString().slice(0,10);
+}
+
+function daysBetween(a,b){
+  const x = new Date(a+"T12:00:00");
+  const y = new Date(b+"T12:00:00");
+  return Math.round((y-x)/86400000);
+}
+
+function uid(prefix="id"){
+  return prefix+"-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,7);
+}
+
+const SAMPLE = {
+  settings:{
+    target:80,
+    maxOpen:2,
+    maxDays:14,
+    minGap:2,
+    weekMin:2,
+    weekMax:3
+  },
+
+  foods:{
+    cf403:{
+      id:"cf403",
+      brand:"凯姿",
+      name:"403鸡肉",
+      size:85,
+      kcal:95,
+      ca:null,
+      p:1597,
+      mg:null,
+      grade:"G1",
+      image:"",
+      dataStatus:"部分数据待核实"
+    },
+    cf409:{
+      id:"cf409",
+      brand:"凯姿",
+      name:"409火鸡鸡兔",
+      size:85,
+      kcal:95,
+      ca:null,
+      p:1531,
+      mg:null,
+      grade:"G1",
+      image:"",
+      dataStatus:"部分数据待核实"
+    },
+    cf413:{
+      id:"cf413",
+      brand:"凯姿",
+      name:"413鸡肉吞拿鱼",
+      size:85,
+      kcal:95,
+      ca:null,
+      p:1520,
+      mg:null,
+      grade:"G1",
+      image:"",
+      dataStatus:"部分数据待核实"
+    },
+    gp5:{
+      id:"gp5",
+      brand:"交响乐",
+      name:"No.5纯鸡",
+      size:200,
+      kcal:110,
+      ca:null,
+      p:2487,
+      mg:null,
+      grade:"G4",
+      image:"",
+      dataStatus:"部分数据待核实"
+    },
+    gp8:{
+      id:"gp8",
+      brand:"交响乐",
+      name:"No.8雉鸡鸭鸡",
+      size:200,
+      kcal:110,
+      ca:null,
+      p:2653,
+      mg:null,
+      grade:"G4",
+      image:"",
+      dataStatus:"部分数据待核实"
+    },
+    gp9:{
+      id:"gp9",
+      brand:"交响乐",
+      name:"No.9雉鸡兔",
+      size:200,
+      kcal:110,
+      ca:null,
+      p:2653,
+      mg:null,
+      grade:"G4",
+      image:"",
+      dataStatus:"部分数据待核实"
+    },
+    mjam:{
+      id:"mjam",
+      brand:"喵吖喵",
+      name:"老年多汁鸡",
+      size:400,
+      kcal:103,
+      ca:null,
+      p:2677,
+      mg:null,
+      grade:"G4",
+      image:"",
+      dataStatus:"部分数据待核实"
+    },
+    pur:{
+      id:"pur",
+      brand:"德金",
+      name:"鸡肉野猪",
+      size:200,
+      kcal:104,
+      ca:null,
+      p:1860,
+      mg:null,
+      grade:"G2",
+      image:"",
+      dataStatus:"部分数据待核实"
+    },
+    ven:{
+      id:"ven",
+      brand:"蔚安迪",
+      name:"鸡肉兔肉",
+      size:400,
+      kcal:105,
+      ca:null,
+      p:2262,
+      mg:null,
+      grade:"G3",
+      image:"",
+      dataStatus:"部分数据待核实"
+    }
+  },
+
+  inventory:[
+    {id:uid("batch"),sku:"cf403",grams:85,count:23},
+    {id:uid("batch"),sku:"cf409",grams:85,count:8},
+    {id:uid("batch"),sku:"cf413",grams:85,count:8},
+    {id:uid("batch"),sku:"gp5",grams:200,count:5},
+    {id:uid("batch"),sku:"gp8",grams:200,count:5},
+    {id:uid("batch"),sku:"gp9",grams:200,count:4},
+    {id:uid("batch"),sku:"mjam",grams:400,count:1},
+    {id:uid("batch"),sku:"pur",grams:200,count:3},
+    {id:uid("batch"),sku:"ven",grams:400,count:1}
+  ],
+
+  opened:[],
+  meals:[],
+  weights:[
+    {date:today(),kg:4.9}
+  ],
+  manualPlans:{}
+};
+
+let state = loadState();
+
+function clone(x){
+  return JSON.parse(JSON.stringify(x));
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved) return JSON.parse(saved);
+  }catch(e){}
+  return clone(SAMPLE);
+}
+
+function saveState(){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+}
+
+function foodName(sku){
+  const f = state.foods[sku];
+  return f ? `${f.brand} · ${f.name}` : sku;
+}
+
+function getFood(sku){
+  return state.foods[sku] || {
+    id:sku,
+    brand:"未知品牌",
+    name:sku,
+    size:0,
+    kcal:null,
+    ca:null,
+    p:null,
+    mg:null,
+    grade:"GX",
+    image:""
+  };
+}
+
+function imageHtml(sku){
+  const f = getFood(sku);
+  if(f.image){
+    return `
+      <div class="food-image">
+        <img src="${escapeAttr(f.image)}"
+             alt="${escapeAttr(foodName(sku))}"
+             loading="lazy"
+             onerror="this.parentElement.innerHTML='🐱'">
+      </div>`;
+  }
+  return `<div class="food-image">🥫</div>`;
+}
+
+function escapeAttr(value){
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/"/g,"&quot;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;");
+}
+
+function activeOpened(){
+  return state.opened.filter(x => x.remaining > .1);
+}
+
+function totalStock(){
+  return state.inventory.reduce((sum,x)=>sum + Math.max(0,+x.count||0),0);
+}
+
+function showToast(message){
+  const el = document.getElementById("toast");
+  el.textContent = message;
+  el.classList.add("on");
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(()=>el.classList.remove("on"),2600);
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.remove("on");
+}
+
+function openModal(id){
+  document.getElementById(id).classList.add("on");
+}
+
+function setSelectOptions(id, options){
+  document.getElementById(id).innerHTML = options;
+}
+
+function todayMeals(){
+  return state.meals.filter(x=>x.date===today());
+}
+
+function gramsToday(){
+  return todayMeals().reduce((sum,x)=>sum + (+x.grams||0),0);
+}
+
+function mineral(food, grams, key){
+  if(food.kcal==null || food[key]==null) return null;
+  return (+grams * +food.kcal / 100) * (+food[key] / 1000);
+}
+
+function nutritionForMeal(meal){
+  const f = getFood(meal.sku);
+  return {
+    kcal:f.kcal==null ? null : (+meal.grams * +f.kcal / 100),
+    ca:mineral(f,meal.grams,"ca"),
+    p:mineral(f,meal.grams,"p"),
+    mg:mineral(f,meal.grams,"mg")
+  };
+}
+
+function formatValue(v,unit=""){
+  return v==null || !Number.isFinite(v) ? "--" : `${Math.round(v)}${unit}`;
+}
+
+function daysUsed(){
+  const set = new Set(state.meals.map(x=>x.date));
+  return set.size || 1;
+}
+
+function buildPlan(){
+  const result = [];
+  let virtualOpen = clone(activeOpened());
+  let inventory = clone(state.inventory);
+  let lastNewCanDate = null;
+
+  for(let i=0;i<30;i++){
+    const date = addDays(today(),i);
+    let remaining = +state.settings.target;
+    const used = [];
+    const opened = [];
+    let reason = "";
+
+    const manual = state.manualPlans[date];
+
+    if(manual){
+      used.push({
+        sku:manual.sku,
+        grams:+manual.grams,
+        source:"manual"
+      });
+      remaining = Math.max(0,remaining - +manual.grams);
+      result.push({
+        date,
+        used,
+        opened:[],
+        missing:remaining,
+        reason:"已使用你的临时调整"
+      });
+      continue;
+    }
+
+    virtualOpen = virtualOpen.filter(x=>x.remaining>.1);
+
+    virtualOpen.sort((a,b)=>{
+      const da = daysBetween(date,a.due);
+      const db = daysBetween(date,b.due);
+      return da-db;
+    });
+
+    for(const can of virtualOpen){
+      if(remaining<=.1) break;
+
+      const take = Math.min(remaining,can.remaining);
+      if(take>.1){
+        can.remaining -= take;
+        remaining -= take;
+        used.push({
+          sku:can.sku,
+          grams:Math.round(take),
+          source:"opened"
+        });
+      }
+    }
+
+    virtualOpen = virtualOpen.filter(x=>x.remaining>.1);
+
+    const canOpen =
+      remaining > .1 &&
+      virtualOpen.length < state.settings.maxOpen &&
+      (!lastNewCanDate ||
+       daysBetween(lastNewCanDate,date)>=state.settings.minGap);
+
+    if(canOpen){
+      const candidates = inventory
+        .filter(x=>x.count>0)
+        .sort((a,b)=>{
+          const fa = getFood(a.sku);
+          const fb = getFood(b.sku);
+
+          const gradeScore = {
+            G1:0,
+            G2:30,
+            G3:60,
+            G4:100,
+            GX:150
+          };
+
+          return (gradeScore[fa.grade]||150)
+               -(gradeScore[fb.grade]||150);
+        });
+
+      const chosen = candidates[0];
+
+      if(chosen){
+        chosen.count--;
+        lastNewCanDate = date;
+
+        const newCan = {
+          id:uid("plan-open"),
+          sku:chosen.sku,
+          openedDate:date,
+          due:addDays(date,state.settings.maxDays),
+          remaining:chosen.grams
+        };
+
+        virtualOpen.push(newCan);
+        opened.push({
+          sku:chosen.sku,
+          grams:chosen.grams
+        });
+
+        const take = Math.min(remaining,newCan.remaining);
+        newCan.remaining -= take;
+        remaining -= take;
+
+        used.push({
+          sku:chosen.sku,
+          grams:Math.round(take),
+          source:"new"
+        });
+
+        reason = "已开罐不足，按规则开新罐";
+      }
+    }
+
+    if(remaining>.1){
+      reason = reason || "库存或同时开罐上限不足";
+    }
+
+    result.push({
+      date,
+      used,
+      opened,
+      missing:Math.round(remaining),
+      reason
+    });
+  }
+
+  return result;
+}
+
+function render(){
+  renderHeader();
+  renderToday();
+  renderOpened();
+  renderPlan();
+  renderNutrition();
+  renderInventory();
+  renderHistory();
+  renderWeights();
+  renderSettings();
+}
+
+function renderHeader(){
+  document.getElementById("stockCount").textContent = totalStock();
+  document.getElementById("openCount").textContent =
+    `${activeOpened().length}/${state.settings.maxOpen}`;
+  document.getElementById("todayGrams").textContent =
+    `${Math.round(gramsToday())}g`;
+
+  const latest = [...state.weights].sort((a,b)=>b.date.localeCompare(a.date))[0];
+  document.getElementById("weightNow").textContent =
+    latest ? `${(+latest.kg).toFixed(2)}kg` : "--";
+}
+
+function renderToday(){
+  const plan = buildPlan()[0];
+  const actual = gramsToday();
+  const target = +state.settings.target;
+  const box = document.getElementById("todayPlan");
+
+  let html = `
+    <div class="notice ${plan.opened.length ? "":"good"}">
+      今日目标 <b>${target}g</b>，已记录 <b>${Math.round(actual)}g</b>
+      <div class="progress">
+        <i style="width:${Math.min(100,actual/target*100)}%"></i>
+      </div>
+    </div>`;
+
+  if(plan.opened.length){
+    html += `<div class="notice" style="margin-top:10px">
+      今天需要开新罐：现有已开罐不足以满足目标。
+    </div>`;
+  }else{
+    html += `<div class="notice good" style="margin-top:10px">
+      今天不需要开新罐，优先使用当前已开罐。
+    </div>`;
+  }
+
+  plan.used.forEach(item=>{
+    html += `
+      <div class="plan-item">
+        ${imageHtml(item.sku)}
+        <div class="item-main">
+          <b>${foodName(item.sku)}</b>
+          <small>
+            建议 ${item.grams}g ·
+            ${item.source==="new" ? "新开" : "使用已开"}
+          </small>
+        </div>
+        <span class="tag">${getFood(item.sku).grade}</span>
+      </div>`;
+  });
+
+  if(plan.missing>0){
+    html += `<div class="notice" style="margin-top:10px">
+      预计还缺 ${plan.missing}g，请检查库存或记录实际开罐情况。
+    </div>`;
+  }
+
+  box.innerHTML = html;
+}
+
+function renderOpened(){
+  const box = document.getElementById("openList");
+  const list = activeOpened();
+
+  if(!list.length){
+    box.innerHTML = `<div class="empty"><span class="emoji">🥫</span>目前没有已开罐</div>`;
+    return;
+  }
+
+  box.innerHTML = list.map(can=>{
+    const remainDays = daysBetween(today(),can.due);
+    const urgent = remainDays<=2;
+
+    return `
+      <div class="open-item">
+        ${imageHtml(can.sku)}
+        <div class="item-main">
+          <b>${foodName(can.sku)}</b>
+          <small>
+            剩余 ${Math.round(can.remaining)}g ·
+            开于 ${can.openedDate}
+          </small>
+          <span class="tag ${urgent?"red":"green"}">
+            ${urgent ? "尽快吃完" : `还剩${Math.max(0,remainDays)}天`}
+          </span>
+        </div>
+        <button class="btn danger" onclick="finishOpened('${can.id}')">吃完</button>
+      </div>`;
+  }).join("");
+}
+
+function renderPlan(){
+  const box = document.getElementById("planList");
+  const plan = buildPlan();
+
+  box.innerHTML = plan.map(day=>{
+    const isToday = day.date===today();
+
+    return `
+      <div class="card" style="margin:0 0 10px;padding:13px;background:#fbfaff">
+        <div class="card-title">
+          <h2 style="font-size:14px">${isToday?"今天":day.date}</h2>
+          <button class="btn secondary" onclick="openManualForDate('${day.date}')">调整</button>
+        </div>
+
+        ${day.opened.map(x=>`
+          <div class="muted">🆕 建议开：${foodName(x.sku)} · ${x.grams}g</div>
+        `).join("")}
+
+        ${day.used.map(x=>`
+          <div class="muted">🍽️ ${foodName(x.sku)} · ${x.grams}g</div>
+        `).join("")}
+
+        ${day.missing?
+          `<div class="notice" style="margin-top:8px">缺少约${day.missing}g</div>`:
+          `<div class="muted" style="margin-top:7px">${day.reason||"优先使用已开罐"}</div>`
+        }
+      </div>`;
+  }).join("");
+}
+
+function renderNutrition(){
+  const since = addDays(today(),-29);
+  const meals = state.meals.filter(x=>x.date>=since);
+
+  let totals = {kcal:0,ca:0,p:0,mg:0};
+  let known = {kcal:0,ca:0,p:0,mg:0};
+  let grams = 0;
+
+  meals.forEach(meal=>{
+    const n = nutritionForMeal(meal);
+    grams += +meal.grams||0;
+
+    ["kcal","ca","p","mg"].forEach(key=>{
+      if(n[key]!=null){
+        totals[key] += n[key];
+        known[key] += +meal.grams||0;
+      }
+    });
+  });
+
+  const denominator = 30;
+
+  document.getElementById("nCal").textContent =
+    known.kcal ? `${Math.round(totals.kcal/denominator)}` : "--";
+  document.getElementById("nCa").textContent =
+    known.ca ? `${Math.round(totals.ca/denominator)}` : "--";
+  document.getElementById("nP").textContent =
+    known.p ? `${Math.round(totals.p/denominator)}` : "--";
+  document.getElementById("nMg").textContent =
+    known.mg ? `${Math.round(totals.mg/denominator)}` : "--";
+
+  document.getElementById("nutritionInfo").innerHTML =
+    `过去30天实际记录湿粮 <b>${Math.round(grams)}g</b>。
+    营养统计只使用已有可靠数据的食品；
+    未知数据不会被当作0。`;
+
+  document.getElementById("coverage").innerHTML =
+    ["kcal","ca","p","mg"].map(key=>{
+      const percent = grams ? Math.round(known[key]/grams*100) : 0;
+      const label = {
+        kcal:"热量",
+        ca:"钙",
+        p:"磷",
+        mg:"镁"
+      }[key];
+
+      return `
+        <div style="margin:11px 0">
+          <div class="card-title" style="margin:0">
+            <span>${label}</span><small>${percent}%有数据</small>
+          </div>
+          <div class="progress">
+            <i style="width:${percent}%"></i>
+          </div>
+        </div>`;
+    }).join("");
+}
+
+function renderInventory(){
+  const q = (document.getElementById("searchInput")?.value||"").toLowerCase();
+  const list = state.inventory.filter(batch=>{
+    const f = getFood(batch.sku);
+    return `${f.brand} ${f.name} ${batch.sku}`.toLowerCase().includes(q)
+      && batch.count>0;
+  });
+
+  const box = document.getElementById("inventoryList");
+
+  if(!list.length){
+    box.innerHTML = `<div class="empty"><span class="emoji">📦</span>没有匹配的库存</div>`;
+    return;
+  }
+
+  box.innerHTML = list.map(batch=>{
+    const f = getFood(batch.sku);
+    return `
+      <div class="inventory-item">
+        ${imageHtml(batch.sku)}
+        <div class="item-main">
+          <b>${foodName(batch.sku)}</b>
+          <small>${batch.grams}g · 库存 ${batch.count}件</small>
+          <span class="tag">${f.grade}</span>
+          ${f.ca==null?'<span class="tag orange">钙未知</span>':''}
+          ${f.p==null?'<span class="tag orange">磷未知</span>':''}
+          ${f.mg==null?'<span class="tag orange">镁未知</span>':''}
+        </div>
+        <button class="btn secondary" onclick="editFood('${batch.sku}')">资料</button>
+      </div>`;
+  }).join("");
+}
+
+function renderHistory(){
+  const box = document.getElementById("historyList");
+  const list = [...state.meals].sort((a,b)=>b.date.localeCompare(a.date));
+
+  if(!list.length){
+    box.innerHTML = `<div class="empty"><span class="emoji">✍️</span>还没有实际摄入记录</div>`;
+    return;
+  }
+
+  box.innerHTML = list.slice(0,100).map(x=>`
+    <div class="history-item">
+      ${imageHtml(x.sku)}
+      <div class="item-main">
+        <b>${x.date} · ${foodName(x.sku)}</b>
+        <small>${x.grams}g ${x.note?`· ${escapeAttr(x.note)}`:""}</small>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderWeights(){
+  const box = document.getElementById("weightList");
+  const list = [...state.weights].sort((a,b)=>b.date.localeCompare(a.date));
+
+  if(!list.length){
+    box.innerHTML = `<div class="empty"><span class="emoji">⚖️</span>还没有体重记录</div>`;
+    return;
+  }
+
+  box.innerHTML = list.map(x=>`
+    <div class="weight-item">
+      <div class="item-main">
+        <b>${x.date}</b>
+        <small>体重 ${(+x.kg).toFixed(2)} kg</small>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderSettings(){
+  document.getElementById("setTarget").value = state.settings.target;
+  document.getElementById("setMaxOpen").value = state.settings.maxOpen;
+  document.getElementById("setMaxDays").value = state.settings.maxDays;
+  document.getElementById("setGap").value = state.settings.minGap;
+  document.getElementById("setWeekMin").value = state.settings.weekMin;
+  document.getElementById("setWeekMax").value = state.settings.weekMax;
+}
+
+function fillFoodSelect(id){
+  const foods = Object.values(state.foods)
+    .sort((a,b)=>foodName(a.id).localeCompare(foodName(b.id),"zh-CN"));
+
+  document.getElementById(id).innerHTML = foods.map(f=>
+    `<option value="${f.id}">${foodName(f.id)} · ${f.size}g</option>`
+  ).join("");
+}
+
+function openCanModal(){
+  fillFoodSelect("canFood");
+  document.getElementById("canDate").value = today();
+
+  const food = getFood(document.getElementById("canFood").value);
+  document.getElementById("canGrams").value = food.size||80;
+
+  document.getElementById("canFood").onchange = ()=>{
+    const f = getFood(document.getElementById("canFood").value);
+    document.getElementById("canGrams").value = f.size||80;
+  };
+
+  openModal("canModal");
+}
+
+function saveOpenedCan(){
+  if(activeOpened().length>=state.settings.maxOpen){
+    showToast("已达到同时开罐上限");
+    return;
+  }
+
+  const sku = document.getElementById("canFood").value;
+  const grams = +document.getElementById("canGrams").value;
+  const date = document.getElementById("canDate").value||today();
+
+  if(!sku || grams<=0){
+    showToast("请填写有效的开罐信息");
+    return;
+  }
+
+  const batch = state.inventory.find(x=>x.sku===sku&&x.grams>=grams&&x.count>0)
+    || state.inventory.find(x=>x.sku===sku&&x.count>0);
+
+  if(!batch){
+    showToast("该食品库存不足");
+    return;
+  }
+
+  batch.count--;
+
+  state.opened.push({
+    id:uid("open"),
+    sku,
+    openedDate:date,
+    due:addDays(date,state.settings.maxDays),
+    remaining:grams,
+    frozen:document.getElementById("canFrozen").checked
+  });
+
+  saveState();
+  closeModal("canModal");
+  render();
+  showToast("已记录开罐，计划已重算");
+}
+
+function openEatModal(){
+  const list = activeOpened();
+
+  if(!list.length){
+    showToast("请先记录已开罐");
+    return;
+  }
+
+  document.getElementById("eatCan").innerHTML = list.map(x=>
+    `<option value="${x.id}">${foodName(x.sku)} · 剩余${Math.round(x.remaining)}g</option>`
+  ).join("");
+
+  document.getElementById("eatDate").value = today();
+
+  const first = list[0];
+  document.getElementById("eatGrams").value =
+    Math.min(state.settings.target,Math.round(first.remaining));
+
+  document.getElementById("eatCan").onchange = ()=>{
+    const can = state.opened.find(x=>x.id===document.getElementById("eatCan").value);
+    if(can) document.getElementById("eatGrams").value =
+      Math.min(state.settings.target,Math.round(can.remaining));
+  };
+
+  openModal("eatModal");
+}
+
+function saveEating(){
+  const id = document.getElementById("eatCan").value;
+  const can = state.opened.find(x=>x.id===id);
+  const grams = +document.getElementById("eatGrams").value;
+  const date = document.getElementById("eatDate").value||today();
+
+  if(!can || grams<=0 || grams>can.remaining+.01){
+    showToast("摄入克数无效");
+    return;
+  }
+
+  can.remaining -= grams;
+
+  state.meals.push({
+    id:uid("meal"),
+    date,
+    sku:can.sku,
+    grams,
+    note:document.getElementById("eatNote").value||""
+  });
+
+  saveState();
+  closeModal("eatModal");
+  render();
+  showToast("已记录实际摄入");
+}
+
+function openManualModal(){
+  fillFoodSelect("manualFood");
+  document.getElementById("manualGrams").value = state.settings.target;
+  openModal("manualModal");
+}
+
+function openManualForDate(date){
+  fillFoodSelect("manualFood");
+  document.getElementById("manualGrams").value = state.settings.target;
+  document.getElementById("manualModal").dataset.date = date;
+  openModal("manualModal");
+}
+
+function saveManualPlan(){
+  const date = document.getElementById("manualModal").dataset.date||today();
+  const sku = document.getElementById("manualFood").value;
+  const grams = +document.getElementById("manualGrams").value;
+
+  if(!sku || grams<=0){
+    showToast("请输入有效计划");
+    return;
+  }
+
+  state.manualPlans[date] = {
+    sku,
+    grams,
+    allowNew:document.getElementById("manualOpen").checked
+  };
+
+  saveState();
+  closeModal("manualModal");
+  render();
+  showToast("今日计划已调整");
+}
+
+function finishOpened(id){
+  const can = state.opened.find(x=>x.id===id);
+  if(!can) return;
+
+  can.remaining = 0;
+  saveState();
+  render();
+  showToast("已将该罐标记为吃完");
+}
+
+function openFoodModal(){
+  [
+    "foodBrand","foodName","foodSize","foodQty",
+    "foodKcal","foodCa","foodP","foodMg","foodImage"
+  ].forEach(id=>document.getElementById(id).value="");
+
+  document.getElementById("foodQty").value = 1;
+  openModal("foodModal");
+}
+
+function saveFood(){
+  const id = uid("food");
+  const brand = document.getElementById("foodBrand").value.trim();
+  const name = document.getElementById("foodName").value.trim();
+  const size = +document.getElementById("foodSize").value;
+  const qty = +document.getElementById("foodQty").value||1;
+
+  if(!brand || !name || size<=0){
+    showToast("请至少填写品牌、名称和规格");
+    return;
+  }
+
+  state.foods[id] = {
+    id,
+    brand,
+    name,
+    size,
+    kcal:+document.getElementById("foodKcal").value||null,
+    ca:+document.getElementById("foodCa").value||null,
+    p:+document.getElementById("foodP").value||null,
+    mg:+document.getElementById("foodMg").value||null,
+    grade:document.getElementById("foodGrade").value,
+    image:document.getElementById("foodImage").value.trim(),
+    dataStatus:"用户录入"
+  };
+
+  state.inventory.push({
+    id:uid("batch"),
+    sku:id,
+    grams:size,
+    count:qty
+  });
+
+  saveState();
+  closeModal("foodModal");
+  render();
+  showToast("食品已加入库存");
+}
+
+function editFood(sku){
+  const f = getFood(sku);
+  const ca = prompt("钙 mg/1000kcal，留空表示未知",f.ca??"");
+  if(ca===null) return;
+
+  const p = prompt("磷 mg/1000kcal，留空表示未知",f.p??"");
+  if(p===null) return;
+
+  const mg = prompt("镁 mg/1000kcal，留空表示未知",f.mg??"");
+  if(mg===null) return;
+
+  const image = prompt("图片路径，例如 images/example.jpg",f.image||"");
+  if(image===null) return;
+
+  f.ca = ca==="" ? null : +ca;
+  f.p = p==="" ? null : +p;
+  f.mg = mg==="" ? null : +mg;
+  f.image = image.trim();
+
+  saveState();
+  render();
+  showToast("食品资料已更新");
+}
+
+function openWeightModal(){
+  document.getElementById("weightDate").value = today();
+
+  const latest = [...state.weights].sort((a,b)=>b.date.localeCompare(a.date))[0];
+  document.getElementById("weightKg").value = latest?.kg||4.9;
+
+  openModal("weightModal");
+}
+
+function saveWeight(){
+  const date = document.getElementById("weightDate").value||today();
+  const kg = +document.getElementById("weightKg").value;
+
+  if(kg<=0){
+    showToast("体重无效");
+    return;
+  }
+
+  state.weights.push({date,kg});
+  saveState();
+  closeModal("weightModal");
+  render();
+  showToast("体重已记录");
+}
+
+function saveSettings(){
+  state.settings.target = Math.max(1,+document.getElementById("setTarget").value||80);
+  state.settings.maxOpen = Math.min(3,Math.max(1,+document.getElementById("setMaxOpen").value||2));
+  state.settings.maxDays = Math.max(1,+document.getElementById("setMaxDays").value||14);
+  state.settings.minGap = Math.max(0,+document.getElementById("setGap").value||2);
+  state.settings.weekMin = Math.max(1,+document.getElementById("setWeekMin").value||2);
+  state.settings.weekMax = Math.max(state.settings.weekMin,+document.getElementById("setWeekMax").value||3);
+
+  saveState();
+  render();
+  showToast("设置已保存");
+}
+
+function rebuildPlan(){
+  render();
+  showToast("已根据当前已开罐和库存重算");
+}
+
+function exportData(){
+  const blob = new Blob([JSON.stringify(state,null,2)],{
+    type:"application/json"
+  });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `caremycat-backup-${today()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(event){
+  const file = event.target.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = ()=>{
+    try{
+      const imported = JSON.parse(reader.result);
+
+      if(!imported.foods || !imported.inventory){
+        throw new Error("invalid");
+      }
+
+      state = imported;
+      saveState();
+      render();
+      showToast("备份导入成功");
+    }catch(e){
+      showToast("备份文件格式不正确");
+    }
+  };
+
+  reader.readAsText(file);
+  event.target.value = "";
+}
+
+function resetData(){
+  if(!confirm("确定恢复示例数据吗？当前数据会被覆盖。")) return;
+
+  state = clone(SAMPLE);
+  saveState();
+  render();
+  showToast("已恢复示例数据");
+}
+
+document.querySelectorAll(".bottom-nav button").forEach(button=>{
+  button.addEventListener("click",()=>{
+    const page = button.dataset.page;
+
+    document.querySelectorAll(".bottom-nav button")
+      .forEach(x=>x.classList.remove("on"));
+
+    document.querySelectorAll(".page")
+      .forEach(x=>x.classList.remove("on"));
+
+    button.classList.add("on");
+    document.getElementById(page).classList.add("on");
+  });
+});
+
+document.querySelectorAll(".modal").forEach(modal=>{
+  modal.addEventListener("click",event=>{
+    if(event.target===modal) modal.classList.remove("on");
+  });
+});
+
+render();
+</script>
+</body>
+</html>
